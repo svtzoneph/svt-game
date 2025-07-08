@@ -4,6 +4,11 @@
   <meta charset="UTF-8" />
   <title>SEVENTEEN Memory Game</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
   <style>
     :root {
       --primary: #ff85c1;
@@ -47,7 +52,6 @@
       align-items: center;
       justify-content: center;
       margin: 10px;
-      font-size: 1rem;
     }
 
     .settings-toggle {
@@ -60,18 +64,23 @@
     }
 
     .settings-panel {
-      position: absolute;
-      bottom: 100px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 20;
-      border-radius: 10px;
-      padding: 10px 15px;
-      font-size: 0.9rem;
-      box-shadow: 0 0 8px rgba(0,0,0,0.2);
-      display: none;
-      margin-bottom: 60px;
-    }
+  position: absolute;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: none;
+  padding: 16px 20px;
+  border-radius: 15px;
+  background: rgba(0, 0, 0, 0.45); /* translucent dark */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  color: #fff;
+  font-size: 0.95rem;
+  max-width: 90%;
+  text-align: left;
+}
 
     .settings-panel label {
       display: block;
@@ -86,9 +95,8 @@
       display: grid;
       gap: 6px;
       width: 90%;
-      margin: 10px auto;
-      padding: 0 8px;
       max-width: 1000px;
+      margin: 10px auto;
       grid-template-columns: repeat(7, 1fr);
     }
 
@@ -96,26 +104,25 @@
       background: var(--card-bg);
       border-radius: 8px;
       overflow: hidden;
-      aspect-ratio: 1 / 1;
+      aspect-ratio: 1/1;
       cursor: pointer;
       position: relative;
       perspective: 1000px;
     }
 
     .card-inner {
-      position: relative;
       width: 100%;
       height: 100%;
-      transition: transform 0.6s;
+      position: relative;
       transform-style: preserve-3d;
+      transition: transform 0.6s;
     }
 
     .card.flipped .card-inner {
       transform: rotateY(180deg);
     }
 
-    .card-front,
-    .card-back {
+    .card-front, .card-back {
       position: absolute;
       width: 100%;
       height: 100%;
@@ -148,56 +155,59 @@
 
     .leaderboard {
       margin-top: 10px;
-      max-width: 400px;
       text-align: center;
-      font-size: 0.9rem;
+      max-width: 400px;
     }
 
     .modal {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.85);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      z-index: 99;
-    }
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.4); /* softer overlay */
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99;
+  color: white;
+}
 
-    .modal-content {
-      background: gray;
-      padding: 25px;
-      border-radius: 15px;
-      text-align: center;
-      max-width: 90%;
-      font-size: 1rem;
-      line-height: 1.6;
-    }
+.modal-content {
+  background: rgba(34, 34, 34, 0.7); /* translucent dark background */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 25px 20px;
+  border-radius: 15px;
+  text-align: center;
+  width: 90%;
+  max-width: 400px;
+  font-size: 1rem;
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+    audio { display: none; }
 
-    audio {
-      display: none;
-    }
-
-    footer {
+      footer {
       width: 100%;
-      color: var(--text-color);
-      padding: 15px 10px 25px;
+      padding: 15px 10px 20px;
       text-align: center;
       border-top: 1px solid rgba(0,0,0,0.1);
       font-size: 0.95rem;
+      background: transparent; /* ← Match body by being transparent */
     }
 
     footer h2 {
       margin: 0;
       font-size: 1.2rem;
       font-weight: 600;
+      color: black;
     }
 
     footer p {
       margin: 5px 0 10px;
       font-size: 1rem;
-      color: var(--primary);
+      color: black;
     }
 
     @media (max-width: 768px) {
@@ -209,16 +219,17 @@
     @media (max-width: 480px) {
       .board {
         grid-template-columns: repeat(4, 1fr);
-        padding: 0 4px;
-      }
-      h1 {
-        font-size: 1.3rem;
       }
     }
   </style>
 </head>
+
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#ff85c1" />
+
 <body data-theme="light">
 
+  <!-- START MODAL -->
   <div id="startModal" class="modal">
     <div class="modal-content">
       <h2>Flip the cards to match all 13 members!</h2>
@@ -226,18 +237,19 @@
     </div>
   </div>
 
+  <!-- WIN MODAL -->
   <div id="winModal" class="modal" style="display:none;">
-  <div class="modal-content">
-    <h2>🎉 Congratulations!</h2>
-    <p>You won in <strong><span id="finalTime"></span></strong> seconds and <strong><span id="finalMoves"></span></strong> moves!</p>
-    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-      <button onclick="startGame(); document.getElementById('winModal').style.display='none';">🔁 Play Again</button>
-      <button onclick="window.location.href='index.html'">🏠 Home</button>
+    <div class="modal-content">
+      <h2>🎉 Congratulations!</h2>
+      <p>You won in <strong><span id="finalTime"></span></strong> seconds and <strong><span id="finalMoves"></span></strong> moves!</p>
+      <div style="margin-top: 10px;">
+        <button onclick="startGame(); document.getElementById('winModal').style.display='none'">🔁 Play Again</button>
+      </div>
     </div>
   </div>
-</div>
 
   <h1>SEVENTEEN Memory Game</h1>
+
   <div class="top-bar">
     <span>⏱ Time: <span id="timer">0</span>s</span>
     <span>🎯 Moves: <span id="moves">0</span></span>
@@ -246,16 +258,15 @@
   <div class="board" id="board"></div>
 
   <div class="leaderboard">
-    <h3>🏆 Best Score</h3>
-    <p><span id="bestTime">--</span> seconds • <span id="bestMoves">--</span> moves</p>
+    <h3>🏆 Best Scores</h3>
+    <p id="bestList">Loading...</p>
   </div>
 
-  <div class="settings-toggle">
+ <div class="settings-toggle">
     <button onclick="toggleSettings()">⚙️</button>
   </div>
 
   <div class="settings-panel" id="settingsPanel">
-    <label><button onclick="toggleTheme()">🌓 Toggle Theme</button></label>
     <label>🔊 BG Music
       <input type="range" id="bgVolume" min="0" max="1" step="0.01" value="1">
       <input type="checkbox" id="bgToggle" checked> On
@@ -270,34 +281,46 @@
     </label>
   </div>
 
+  <div class="settings-panel" id="settingsPanel">
+    <label><button onclick="toggleTheme()">🌓</button></label><br>
+    <label>🔊 BG Music <input type="checkbox" id="bgToggle" checked></label><br>
+    <label>🔉 Flip Sound <input type="checkbox" id="flipToggle" checked></label><br>
+    <label>🎵 Match Sound <input type="checkbox" id="matchToggle" checked></label>
+  </div>
+
   <footer>
     <h2>SEVENTEEN Memory Game</h2>
     <p>BY: Hoskwi_onX</p>
   </footer>
 
-  <div id="aboutModal" class="modal" style="display:none;">
-    <div class="modal-content">
-      <h2>About the SEVENTEEN Memory Game</h2>
-      <p>This fan-made memory game is dedicated to SEVENTEEN (SVT). Flip the cards to match all 13 members and test your memory skills!</p>
-      <p>Enjoy the visuals and music while remembering the names and faces of S.Coups, Jeonghan, Joshua, Jun, Hoshi, Wonwoo, Woozi, The8, Mingyu, DK, Seungkwan, Vernon, and Dino!</p>
-      <button onclick="document.getElementById('aboutModal').style.display='none'">❌ Close</button>
-    </div>
-  </div>
-
-<audio id="flipSound" src="/audio/flip.mp3"></audio>
-<audio id="matchSound" src="/audio/match.mp3"></audio>
-<audio id="bgMusic" src="/audio/bg.mp3" autoplay loop></audio>
+  <!-- Audio -->
+  <audio id="flipSound" src="/audio/flip.mp3"></audio>
+  <audio id="matchSound" src="/audio/match.mp3"></audio>
+  <audio id="bgMusic" src="/audio/bg.mp3" autoplay loop></audio>
 
   <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
+      authDomain: "tvnstream-b4497.firebaseapp.com",
+      databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
+      projectId: "tvnstream-b4497",
+      storageBucket: "tvnstream-b4497.appspot.com",
+      messagingSenderId: "308384754214",
+      appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
+      measurementId: "G-VFNH70R4D9"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
     const members = [
       "scoups", "jeonghan", "joshua", "jun", "hoshi", "wonwoo", "woozi",
       "the8", "mingyu", "dk", "seungkwan", "vernon", "dino"
     ];
+
     const board = document.getElementById('board');
     const timerEl = document.getElementById('timer');
     const movesEl = document.getElementById('moves');
-    const bestTimeEl = document.getElementById('bestTime');
-    const bestMovesEl = document.getElementById('bestMoves');
+    const bestListEl = document.getElementById('bestList');
     const flipSound = document.getElementById('flipSound');
     const matchSound = document.getElementById('matchSound');
     const bgMusic = document.getElementById('bgMusic');
@@ -315,7 +338,7 @@
       card.innerHTML = `
         <div class="card-inner">
           <div class="card-back"></div>
-          <div class="card-front"><img src="/img/${name}.jpg"> alt="${name}"></div>
+          <div class="card-front"><img src="/img/${name}.jpg" alt="${name}"></div>
         </div>
       `;
       card.addEventListener('click', () => flipCard(card));
@@ -370,19 +393,36 @@
       setTimeout(() => {
         finalTime.textContent = timer;
         finalMoves.textContent = moves;
-        winModal.style.display = "flex";
-        const best = JSON.parse(localStorage.getItem("seventeen-best") || "{}");
-        if (!best.time || timer < best.time || (timer === best.time && moves < best.moves)) {
-          localStorage.setItem("seventeen-best", JSON.stringify({ time: timer, moves }));
+        const playerName = prompt("🎉 You won! Enter your name for the leaderboard:");
+        if (playerName) {
+          db.ref("leaderboard").push({
+            name: playerName,
+            time: timer,
+            moves: moves,
+            timestamp: Date.now()
+          });
         }
-        updateBest();
+        winModal.style.display = "flex";
+        loadLeaderboard();
       }, 500);
     }
 
-    function updateBest() {
-      const best = JSON.parse(localStorage.getItem("seventeen-best") || "{}");
-      bestTimeEl.textContent = best.time || "--";
-      bestMovesEl.textContent = best.moves || "--";
+    function loadLeaderboard() {
+      db.ref("leaderboard").once("value", snapshot => {
+        const data = snapshot.val();
+        if (!data) {
+          bestListEl.innerHTML = "No scores yet.";
+          return;
+        }
+        const scores = Object.values(data).sort((a, b) => {
+          if (a.time === b.time) return a.moves - b.moves;
+          return a.time - b.time;
+        }).slice(0, 5);
+        bestListEl.innerHTML = `<ul style="list-style:none;padding:0;">` +
+          scores.map(score =>
+            `<li>${score.name}: ⏱ ${score.time}s, 🎯 ${score.moves} moves</li>`
+          ).join('') + `</ul>`;
+      });
     }
 
     function toggleTheme() {
@@ -392,23 +432,21 @@
 
     function toggleSettings() {
       const panel = document.getElementById('settingsPanel');
-      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+      panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
     }
 
-    document.getElementById('bgVolume').addEventListener('input', e => {
-      bgMusic.volume = parseFloat(e.target.value);
-    });
-    document.getElementById('flipVolume').addEventListener('input', e => {
-      flipSound.volume = parseFloat(e.target.value);
-    });
-    document.getElementById('matchVolume').addEventListener('input', e => {
-      matchSound.volume = parseFloat(e.target.value);
-    });
     document.getElementById('bgToggle').addEventListener('change', e => {
       bgMusic.muted = !e.target.checked;
     });
 
-    updateBest();
+    loadLeaderboard();
   </script>
+  
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js');
+  }
+</script>
+  
 </body>
 </html>
