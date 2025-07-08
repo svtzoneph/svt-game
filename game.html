@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <title>SEVENTEEN Memory Game</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  
+  <link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#ff85c1" />
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -224,9 +225,6 @@
   </style>
 </head>
 
-<link rel="manifest" href="manifest.json" />
-<meta name="theme-color" content="#ff85c1" />
-
 <body data-theme="light">
 
   <!-- START MODAL -->
@@ -238,15 +236,15 @@
   </div>
 
   <!-- WIN MODAL -->
-  <div id="winModal" class="modal" style="display:none;">
-    <div class="modal-content">
-      <h2>🎉 Congratulations!</h2>
-      <p>You won in <strong><span id="finalTime"></span></strong> seconds and <strong><span id="finalMoves"></span></strong> moves!</p>
-      <div style="margin-top: 10px;">
-        <button onclick="startGame(); document.getElementById('winModal').style.display='none'">🔁 Play Again</button>
-      </div>
-    </div>
+ <div class="modal-content">
+  <h2>🎉 Congratulations!</h2>
+  <p>You won in <strong><span id="finalTime"></span></strong> seconds and <strong><span id="finalMoves"></span></strong> moves!</p>
+  <div style="margin-top: 10px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+    <button onclick="startGame(); document.getElementById('winModal').style.display='none'">Play Again</button>
+    <button onclick="window.location.href='index.html'">Home</button>
   </div>
+</div>
+
 
   <h1>SEVENTEEN Memory Game</h1>
 
