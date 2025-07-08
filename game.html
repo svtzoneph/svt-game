@@ -284,9 +284,9 @@
     </div>
   </div>
 
- <audio id="bgMusic" autoplay loop src="https://svtzoneph.github.io/svt-game/audio/bg.mp3"></audio>
-<audio id="flipSound" src="https://svtzoneph.github.io/svt-game/audio/flip.mp3"></audio>
-<audio id="matchSound" src="https://svtzoneph.github.io/svt-game/audio/match.mp3"></audio>
+<audio id="flipSound" src="/audio/flip.mp3"></audio>
+<audio id="matchSound" src="/audio/match.mp3"></audio>
+<audio id="bgMusic" src="/audio/bg.mp3" autoplay loop></aud
 
   <script>
     const members = [
@@ -315,7 +315,7 @@
       card.innerHTML = `
         <div class="card-inner">
           <div class="card-back"></div>
-          <div class="card-front"><img src="https://svtzoneph.github.io/svt-game/img/${name}.jpg">" alt="${name}"></div>
+          <div class="card-front"><img src="/img/${name}.jpg"> alt="${name}"></div>
         </div>
       `;
       card.addEventListener('click', () => flipCard(card));
