@@ -262,21 +262,22 @@
  <div class="settings-toggle">
     <button onclick="toggleSettings()">⚙️</button>
   </div>
-
-  <div class="settings-panel" id="settingsPanel">
-    <label>🔊 BG Music
-      <input type="range" id="bgVolume" min="0" max="1" step="0.01" value="1">
-      <input type="checkbox" id="bgToggle" checked> On
-    </label>
-    <label>🔉 Flip Sound
-      <input type="range" id="flipVolume" min="0" max="1" step="0.01" value="1">
-      <input type="checkbox" id="flipToggle" checked> On
-    </label>
-    <label>🎵 Match Sound
-      <input type="range" id="matchVolume" min="0" max="1" step="0.01" value="1">
-      <input type="checkbox" id="matchToggle" checked> On
-    </label>
-  </div>
+  
+<!-- ✅ KEEP ONLY THIS ONE -->
+<div class="settings-panel" id="settingsPanel">
+  <label>🔊 BG Music
+    <input type="range" id="bgVolume" min="0" max="1" step="0.01" value="1">
+    <input type="checkbox" id="bgToggle" checked> On
+  </label>
+  <label>🔉 Flip Sound
+    <input type="range" id="flipVolume" min="0" max="1" step="0.01" value="1">
+    <input type="checkbox" id="flipToggle" checked> On
+  </label>
+  <label>🎵 Match Sound
+    <input type="range" id="matchVolume" min="0" max="1" step="0.01" value="1">
+    <input type="checkbox" id="matchToggle" checked> On
+  </label>
+</div>
 
   <div class="settings-panel" id="settingsPanel">
     <label>🔊 BG Music <input type="checkbox" id="bgToggle" checked></label><br>
@@ -380,15 +381,49 @@
       }
     }
 
- function gameWin() {
+function gameWin() {
   clearInterval(interval);
+
+  // Delay to ensure all animations complete
   setTimeout(() => {
     finalTime.textContent = timer;
     finalMoves.textContent = moves;
-    winModal.style.display = "flex";
-    document.getElementById('playerNameInput').focus(); // focus the input field
+
+    // Check rank before submitting
+    db.ref("leaderboard").once("value", snapshot => {
+      const data = snapshot.val() || {};
+      const scores = Object.values(data);
+
+      // Add current run to comparison pool (not yet saved)
+      scores.push({
+        name: "You",
+        time: timer,
+        moves: moves
+      });
+
+      // Sort and find rank
+      scores.sort((a, b) => {
+        if (a.time === b.time) return a.moves - b.moves;
+        return a.time - b.time;
+      });
+
+      const rank = scores.findIndex(score => score.name === "You") + 1;
+
+      // Show rank
+      const rankMsg = document.createElement('p');
+      rankMsg.textContent = `🏆 You are currently ranked #${rank} on the leaderboard!`;
+      const winModal = document.getElementById('winModal');
+      const existingMsg = winModal.querySelector('.rank-msg');
+      if (existingMsg) existingMsg.remove();
+      rankMsg.className = 'rank-msg';
+      winModal.querySelector('.modal-content').insertBefore(rankMsg, document.getElementById("playerNameInput"));
+
+      winModal.style.display = "flex";
+      document.getElementById('playerNameInput').focus();
+    });
   }, 500);
 }
+
 
 function submitScore() {
   const playerName = document.getElementById("playerNameInput").value.trim();
@@ -447,6 +482,37 @@ function submitScore() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js');
   }
+
+  // ✅ Volume Sliders - Adjust volume live
+  document.getElementById('bgVolume').addEventListener('input', (e) => {
+    bgMusic.volume = parseFloat(e.target.value);
+  });
+
+  document.getElementById('flipVolume').addEventListener('input', (e) => {
+    flipSound.volume = parseFloat(e.target.value);
+  });
+
+  document.getElementById('matchVolume').addEventListener('input', (e) => {
+    matchSound.volume = parseFloat(e.target.value);
+  });
+
+  // ✅ Mute Checkboxes - Toggle mute
+  document.getElementById('bgToggle').addEventListener('change', (e) => {
+    bgMusic.muted = !e.target.checked;
+  });
+
+  document.getElementById('flipToggle').addEventListener('change', (e) => {
+    flipSound.muted = !e.target.checked;
+  });
+
+  document.getElementById('matchToggle').addEventListener('change', (e) => {
+    matchSound.muted = !e.target.checked;
+  });
+
+  // ✅ Set initial volumes
+  bgMusic.volume = 1;
+  flipSound.volume = 1;
+  matchSound.volume = 1;
 </script>
   
 </body>
