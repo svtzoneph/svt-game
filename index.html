@@ -4,11 +4,12 @@
   <meta charset="UTF-8" />
   <title>Match the Card SVT</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="manifest" href="manifest.json" />
-<meta name="theme-color" content="#ff85c1" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#ff85c1" />
   <link rel="apple-touch-icon" href="svt_memory_game.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -30,14 +31,14 @@
     header { margin-top: 30px; }
     h1 { font-size: 2rem; color: black; }
 
-   main {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  width: 100%; /* add this */
-}
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      width: 100%;
+    }
 
     button {
       background: #ff85c1;
@@ -54,11 +55,14 @@
     button:hover { background: #e66cae; }
 
     .bottom-buttons {
-      margin-bottom: 20px;
+      margin-bottom: 25px;
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
       gap: 12px;
+      padding: 0 10px;
+      width: 100%;
+      max-width: 500px;
     }
 
     footer {
@@ -79,91 +83,107 @@
       width: 100%; height: 100%;
       background: rgba(0, 0, 0, 0.4);
       backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
       display: none;
       align-items: center;
       justify-content: center;
-      color: white;
       z-index: 99;
     }
 
-   .modal-content {
-  background: #222;
-  padding: 40px 60px;
-  border-radius: 18px;
-  text-align: center;
-  max-width: 650px;
-  width: 90%;
-  font-size: 1.1rem;
-  line-height: 1.9;
-  max-height: 90vh; /* so it doesn’t overflow on small screens */
-  overflow-y: auto; /* scroll inside modal if needed */
-}
+    .modal-content {
+      background: #222;
+      padding: 40px 30px;
+      border-radius: 18px;
+      text-align: center;
+      max-width: 700px;
+      width: 95%;
+      font-size: 1.1rem;
+      line-height: 1.9;
+      max-height: 90vh;
+      overflow-y: auto;
+      color: white;
+    }
 
-.modal-content button {
-  margin-top: 20px;
-  padding: 10px 16px;
-  background: #ff85c1;
-  border: none;
-  color: white;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-}
+    .modal-content button {
+      margin-top: 20px;
+      padding: 10px 16px;
+      background: #ff85c1;
+      border: none;
+      color: white;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
 
-.bottom-buttons {
-  margin-bottom: 25px;
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  padding: 0 10px;
-  width: 100%;
-  max-width: 500px;
-}
+    .leaderboard-scroll {
+      max-height: 350px;
+      overflow-y: auto;
+      margin-top: 10px;
+      border: 2px solid #fff;
+      border-radius: 10px;
+    }
 
-@media (max-width: 480px) {
-  .bottom-buttons {
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-  }
+    .leaderboard-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 1rem;
+    }
 
-  button {
-    width: 100%;
-    max-width: 260px;
-  }
-  
-  .modal-content {
-    font-size: 0.9rem;
-    padding: 20px 15px;
-    width: 95%;
-    max-width: 95%;
-    line-height: 1.6;
-  }
+    .leaderboard-table th,
+    .leaderboard-table td {
+      padding: 12px;
+      text-align: center;
+      color: #fff;
+    }
 
-  .modal-content h2 {
-    font-size: 1.2rem;
-    margin-bottom: 10px;
-  }
+    .leaderboard-table thead {
+      background-color: #ff85c1;
+      position: sticky;
+      top: 0;
+    }
 
-  .modal-content button {
-    font-size: 0.8rem;
-    padding: 10px;
-    width: 100%;
-    max-width: 200px;
-  }
+    .leaderboard-table tbody tr:nth-child(odd) {
+      background-color: #3d3d3d;
+    }
 
-  .leaderboard-list {
-    font-size: 0.8rem;
-  }
+    .leaderboard-table tbody tr:nth-child(even) {
+      background-color: #2c2c2c;
+    }
 
-  .bottom-buttons {
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-  }
-}
+    .leaderboard-table tr.highlight {
+      background-color: #ffd700 !important;
+      color: black;
+    }
+
+    @media (max-width: 480px) {
+      .modal-content {
+        font-size: 0.9rem;
+        padding: 20px 15px;
+        width: 95%;
+      }
+
+      .modal-content h2 {
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+      }
+
+      .modal-content button {
+        font-size: 0.8rem;
+        padding: 10px;
+        width: 100%;
+        max-width: 200px;
+      }
+
+      .bottom-buttons {
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+      }
+
+      button {
+        width: 100%;
+        max-width: 260px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -184,44 +204,50 @@
 
   <footer>
     <h2>Match the Card SVT</h2>
-    <p>BY:******_***</p>
+    <p>BY: ******_***</p>
   </footer>
 
   <!-- About Modal -->
-<div id="aboutModal" class="modal">
-  <div class="modal-content">
-    <h2>About the Flip  the Card SVT</h2>
-    <p>This fan-made game is made for CARATS🃏💎 Flip cards to match each member and test your memory skills.</p>
-    <p>Tap any card to flip it, then flip another to try and match the pair. If they match, they stay open. If not, they'll flip back — remember their spots!</p>
-    <p>⏱️ A timer records how long you take to complete each level — try to finish as fast as you can!</p>
-    <p>🎯 A move counter tracks how many moves you’ve made — challenge yourself to complete the game with fewer flips!</p>
-    <p>There’s no time limit or move limit, so you can enjoy the game at your own pace.</p>
-    <p>💖 This game is completely FREE to play — enjoy and have fun, Carats!</p>
-    
-    <p><strong>This version is currently in test run</strong>, so you're getting an early preview of the gameplay. More updates are coming soon!</p>
-
-    <p><strong>🛠️ Upcoming Features:</strong></p>
-    <p style="text-align: left; padding-left: 20px; margin-top: -10px;">
-      <li>🔓 Multiple Levels</li>
-      <li>⏱️ Time Challenges</li>
-      <li>🎨 Custom Themes</li>
-    </p>
-    
-    <button onclick="document.getElementById('aboutModal').style.display='none'">❌ Close</button>
+  <div id="aboutModal" class="modal">
+    <div class="modal-content">
+      <h2>About Flip the Card SVT</h2>
+      <p>This fan-made game is made for CARATS🃏💎 Flip cards to match each member and test your memory skills.</p>
+      <p>⏱️ A timer records how long you take — try to finish fast!</p>
+      <p>🎯 A move counter tracks how many flips you made.</p>
+      <p><strong>🛠️ Upcoming Features:</strong></p>
+      <ul style="text-align: left; padding-left: 20px;">
+        <li>🔓 Multiple Levels</li>
+        <li>⏱️ Time Challenges</li>
+        <li>🎨 Custom Themes</li>
+      </ul>
+      <button onclick="document.getElementById('aboutModal').style.display='none'">❌ Close</button>
+    </div>
   </div>
-</div>
 
   <!-- Leaderboard Modal -->
   <div id="leaderboardModal" class="modal">
     <div class="modal-content">
       <h2>🏆 Leaderboard</h2>
-      <div class="leaderboard-list" id="leaderboardList">Loading...</div>
+      <div class="leaderboard-scroll">
+        <table class="leaderboard-table">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Name</th>
+              <th>Time (s)</th>
+              <th>Moves</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardList">
+            <tr><td colspan="4">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
       <button onclick="document.getElementById('leaderboardModal').style.display='none'">❌ Close</button>
     </div>
   </div>
 
   <script>
-    // Firebase config (your config here)
     const firebaseConfig = {
       apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
       authDomain: "tvnstream-b4497.firebaseapp.com",
@@ -238,12 +264,12 @@
     function showLeaderboard() {
       const modal = document.getElementById('leaderboardModal');
       const list = document.getElementById('leaderboardList');
-      list.innerHTML = "Loading...";
+      list.innerHTML = "<tr><td colspan='4'>Loading...</td></tr>";
 
       db.ref("leaderboard").once("value", snapshot => {
         const data = snapshot.val();
         if (!data) {
-          list.innerHTML = "No scores yet.";
+          list.innerHTML = "<tr><td colspan='4'>No scores yet.</td></tr>";
           modal.style.display = 'flex';
           return;
         }
@@ -251,27 +277,30 @@
         const scores = Object.values(data).sort((a, b) => {
           if (a.time === b.time) return a.moves - b.moves;
           return a.time - b.time;
-        }).slice(0, 5);
+        });
 
-        list.innerHTML = `
-          <ul style="list-style:none;padding:0;">
-            ${scores.map(score => `
-              <li>
-                <strong>${score.name}</strong>: ⏱ ${score.time}s, 🎯 ${score.moves} moves
-              </li>
-            `).join('')}
-          </ul>
-        `;
+        list.innerHTML = scores.map((score, index) => {
+          const rank = index + 1;
+          const isYou = score.name.toLowerCase() === "you";
+          const medal = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : rank;
+
+          return `
+            <tr class="${isYou ? 'highlight' : ''}">
+              <td>${medal}</td>
+              <td>${score.name}</td>
+              <td>${score.time}</td>
+              <td>${score.moves}</td>
+            </tr>
+          `;
+        }).join('');
+
         modal.style.display = 'flex';
       });
     }
-  </script>
-  
-  <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js');
-  }
-</script>
 
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js');
+    }
+  </script>
 </body>
 </html>
