@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SEVENTEEN Memory Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      --primary: #ff85c1;
+      --bg-light: #ffffff;
+      --bg-dark: #1a1a1a;
+      --card-bg: #fff;
+      --text-color: #000;
+    }
+
+    [data-theme="dark"] {
+      --bg-light: #1a1a1a;
+      --card-bg: #2b2b2b;
+      --text-color: #fefefe;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+      transition: all 0.3s ease;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f7cfe3, #c6dff5);
+      color: var(--text-color);
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    h1 {
+      margin-top: 20px;
+      font-size: 1.6rem;
+      text-align: center;
+    }
+
+    .top-bar {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      justify-content: center;
+      margin: 10px;
+      font-size: 1rem;
+    }
+
+    .settings-toggle {
+      position: relative;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      margin: 20px 0 10px;
+      z-index: 30;
+    }
+
+    .settings-panel {
+      position: absolute;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      border-radius: 10px;
+      padding: 10px 15px;
+      font-size: 0.9rem;
+      box-shadow: 0 0 8px rgba(0,0,0,0.2);
+      display: none;
+      margin-bottom: 60px;
+    }
+
+    .settings-panel label {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .settings-panel input[type="range"] {
+      width: 100%;
+    }
+
+    .board {
+      display: grid;
+      gap: 6px;
+      width: 90%;
+      margin: 10px auto;
+      padding: 0 8px;
+      max-width: 1000px;
+      grid-template-columns: repeat(7, 1fr);
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 8px;
+      overflow: hidden;
+      aspect-ratio: 1 / 1;
+      cursor: pointer;
+      position: relative;
+      perspective: 1000px;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+    }
+
+    .card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-front,
+    .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+    }
+
+    .card-back {
+      background: url('https://uploads.onecompiler.io/43ddry4jt/43q3jr33a/add%20game%20below%20the%20m.png') center center / cover no-repeat;
+    }
+
+    .card-front {
+      transform: rotateY(180deg);
+    }
+
+    .card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    button {
+      background: var(--primary);
+      color: white;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .leaderboard {
+      margin-top: 10px;
+      max-width: 400px;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      z-index: 99;
+    }
+
+    .modal-content {
+      background: gray;
+      padding: 25px;
+      border-radius: 15px;
+      text-align: center;
+      max-width: 90%;
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    audio {
+      display: none;
+    }
+
+    footer {
+      width: 100%;
+      color: var(--text-color);
+      padding: 15px 10px 25px;
+      text-align: center;
+      border-top: 1px solid rgba(0,0,0,0.1);
+      font-size: 0.95rem;
+    }
+
+    footer h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    footer p {
+      margin: 5px 0 10px;
+      font-size: 1rem;
+      color: var(--primary);
+    }
+
+    @media (max-width: 768px) {
+      .board {
+        grid-template-columns: repeat(5, 1fr);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .board {
+        grid-template-columns: repeat(4, 1fr);
+        padding: 0 4px;
+      }
+      h1 {
+        font-size: 1.3rem;
+      }
+    }
+  </style>
+</head>
+<body data-theme="light">
+
+  <div id="startModal" class="modal">
+    <div class="modal-content">
+      <h2>Flip the cards to match all 13 members!</h2>
+      <button onclick="startGame()">Start</button>
+    </div>
+  </div>
+
+  <div id="winModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <h2>🎉 Congratulations!</h2>
+    <p>You won in <strong><span id="finalTime"></span></strong> seconds and <strong><span id="finalMoves"></span></strong> moves!</p>
+    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+      <button onclick="startGame(); document.getElementById('winModal').style.display='none';">🔁 Play Again</button>
+      <button onclick="window.location.href='index.html'">🏠 Home</button>
+    </div>
+  </div>
+</div>
+
+  <h1>SEVENTEEN Memory Game</h1>
+  <div class="top-bar">
+    <span>⏱ Time: <span id="timer">0</span>s</span>
+    <span>🎯 Moves: <span id="moves">0</span></span>
+  </div>
+
+  <div class="board" id="board"></div>
+
+  <div class="leaderboard">
+    <h3>🏆 Best Score</h3>
+    <p><span id="bestTime">--</span> seconds • <span id="bestMoves">--</span> moves</p>
+  </div>
+
+  <div class="settings-toggle">
+    <button onclick="toggleSettings()">⚙️</button>
+  </div>
+
+  <div class="settings-panel" id="settingsPanel">
+    <label><button onclick="toggleTheme()">🌓 Toggle Theme</button></label>
+    <label>🔊 BG Music
+      <input type="range" id="bgVolume" min="0" max="1" step="0.01" value="1">
+      <input type="checkbox" id="bgToggle" checked> On
+    </label>
+    <label>🔉 Flip Sound
+      <input type="range" id="flipVolume" min="0" max="1" step="0.01" value="1">
+      <input type="checkbox" id="flipToggle" checked> On
+    </label>
+    <label>🎵 Match Sound
+      <input type="range" id="matchVolume" min="0" max="1" step="0.01" value="1">
+      <input type="checkbox" id="matchToggle" checked> On
+    </label>
+  </div>
+
+  <footer>
+    <h2>SEVENTEEN Memory Game</h2>
+    <p>BY: Hoskwi_onX</p>
+  </footer>
+
+  <div id="aboutModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <h2>About the SEVENTEEN Memory Game</h2>
+      <p>This fan-made memory game is dedicated to SEVENTEEN (SVT). Flip the cards to match all 13 members and test your memory skills!</p>
+      <p>Enjoy the visuals and music while remembering the names and faces of S.Coups, Jeonghan, Joshua, Jun, Hoshi, Wonwoo, Woozi, The8, Mingyu, DK, Seungkwan, Vernon, and Dino!</p>
+      <button onclick="document.getElementById('aboutModal').style.display='none'">❌ Close</button>
+    </div>
+  </div>
+
+  <audio id="bgMusic" autoplay loop src="https://cdn.pixabay.com/audio/2022/03/17/audio_1f4ccde928.mp3"></audio>
+  <audio id="flipSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_ef3c2d1bc4.mp3"></audio>
+  <audio id="matchSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_126349e739.mp3"></audio>
+
+  <script>
+    const members = [
+      "scoups", "jeonghan", "joshua", "jun", "hoshi", "wonwoo", "woozi",
+      "the8", "mingyu", "dk", "seungkwan", "vernon", "dino"
+    ];
+    const board = document.getElementById('board');
+    const timerEl = document.getElementById('timer');
+    const movesEl = document.getElementById('moves');
+    const bestTimeEl = document.getElementById('bestTime');
+    const bestMovesEl = document.getElementById('bestMoves');
+    const flipSound = document.getElementById('flipSound');
+    const matchSound = document.getElementById('matchSound');
+    const bgMusic = document.getElementById('bgMusic');
+    const startModal = document.getElementById('startModal');
+    const winModal = document.getElementById('winModal');
+    const finalTime = document.getElementById('finalTime');
+    const finalMoves = document.getElementById('finalMoves');
+
+    let cards = [], flipped = [], matched = 0, timer = 0, moves = 0, interval;
+
+    function createCard(name) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.dataset.name = name;
+      card.innerHTML = `
+        <div class="card-inner">
+          <div class="card-back"></div>
+          <div class="card-front"><img src="https://svt303.github.io/SEVENTEEN/img/${name}.jpg" alt="${name}"></div>
+        </div>
+      `;
+      card.addEventListener('click', () => flipCard(card));
+      return card;
+    }
+
+    function startGame() {
+      winModal.style.display = "none";
+      startModal.style.display = "none";
+      board.innerHTML = '';
+      cards = [...members, ...members].sort(() => 0.5 - Math.random());
+      cards.forEach(name => board.appendChild(createCard(name)));
+      flipped = [];
+      matched = 0;
+      timer = 0;
+      moves = 0;
+      movesEl.textContent = 0;
+      timerEl.textContent = 0;
+      clearInterval(interval);
+      interval = setInterval(() => {
+        timer++;
+        timerEl.textContent = timer;
+      }, 1000);
+    }
+
+    function flipCard(card) {
+      if (card.classList.contains('flipped') || flipped.length >= 2) return;
+      if (document.getElementById('flipToggle').checked) flipSound.play();
+      card.classList.add('flipped');
+      flipped.push(card);
+      if (flipped.length === 2) {
+        moves++;
+        movesEl.textContent = moves;
+        const [a, b] = flipped;
+        if (a.dataset.name === b.dataset.name) {
+          if (document.getElementById('matchToggle').checked) matchSound.play();
+          matched += 2;
+          flipped = [];
+          if (matched === cards.length) gameWin();
+        } else {
+          setTimeout(() => {
+            a.classList.remove('flipped');
+            b.classList.remove('flipped');
+            flipped = [];
+          }, 800);
+        }
+      }
+    }
+
+    function gameWin() {
+      clearInterval(interval);
+      setTimeout(() => {
+        finalTime.textContent = timer;
+        finalMoves.textContent = moves;
+        winModal.style.display = "flex";
+        const best = JSON.parse(localStorage.getItem("seventeen-best") || "{}");
+        if (!best.time || timer < best.time || (timer === best.time && moves < best.moves)) {
+          localStorage.setItem("seventeen-best", JSON.stringify({ time: timer, moves }));
+        }
+        updateBest();
+      }, 500);
+    }
+
+    function updateBest() {
+      const best = JSON.parse(localStorage.getItem("seventeen-best") || "{}");
+      bestTimeEl.textContent = best.time || "--";
+      bestMovesEl.textContent = best.moves || "--";
+    }
+
+    function toggleTheme() {
+      const current = document.body.dataset.theme;
+      document.body.dataset.theme = current === "dark" ? "light" : "dark";
+    }
+
+    function toggleSettings() {
+      const panel = document.getElementById('settingsPanel');
+      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    }
+
+    document.getElementById('bgVolume').addEventListener('input', e => {
+      bgMusic.volume = parseFloat(e.target.value);
+    });
+    document.getElementById('flipVolume').addEventListener('input', e => {
+      flipSound.volume = parseFloat(e.target.value);
+    });
+    document.getElementById('matchVolume').addEventListener('input', e => {
+      matchSound.volume = parseFloat(e.target.value);
+    });
+    document.getElementById('bgToggle').addEventListener('change', e => {
+      bgMusic.muted = !e.target.checked;
+    });
+
+    updateBest();
+  </script>
+</body>
+</html>
