@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SEVENTEEN Memory Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+  
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      height: 100vh;
+      background: linear-gradient(135deg, #f7cfe3, #c6dff5);
+      color: #333;
+      text-align: center;
+    }
+
+    header {
+      margin-top: 30px;
+    }
+
+    h1 {
+      font-size: 2rem;
+      color: black;
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+    }
+
+    button {
+      background: #ff85c1;
+      border: none;
+      padding: 15px 25px;
+      color: white;
+      font-size: 1.1rem;
+      border-radius: 10px;
+      margin: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #e66cae;
+    }
+
+    .bottom-buttons {
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    footer {
+      width: 100%;
+      padding: 15px 10px 20px;
+      text-align: center;
+      border-top: 1px solid rgba(0,0,0,0.1);
+      font-size: 0.95rem;
+      background: transparent; /* ← Match body by being transparent */
+    }
+
+    footer h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: black;
+    }
+
+    footer p {
+      margin: 5px 0 10px;
+      font-size: 1rem;
+      color: black;
+    }
+
+    /* Modal Style */
+    .modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.4); /* softer transparency */
+  backdrop-filter: blur(6px);     /* ✅ subtle background blur */
+  -webkit-backdrop-filter: blur(6px); /* for Safari */
+  display: none;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  z-index: 99;
+}
+
+   .modal-content {
+  background: #222;
+  padding: 35px 45px;
+  border-radius: 18px;
+  text-align: center;
+  max-width: 500px;
+  font-size: 1.1rem;
+  line-height: 1.8;
+}
+
+    .modal-content button {
+      margin-top: 20px;
+      padding: 10px 16px;
+      background: #ff85c1;
+      border: none;
+      color: white;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.6rem;
+      }
+
+      button {
+        font-size: 1rem;
+        padding: 12px 20px;
+      }
+
+      .modal-content {
+        font-size: 0.95rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>SEVENTEEN Memory Game</h1>
+  </header>
+
+  <main>
+    <button onclick="location.href='game.html'">🎮 Start Game</button>
+  </main>
+
+  <div class="bottom-buttons">
+    <button onclick="alert('Adjust theme and audio in the game screen.')">⚙️ Settings</button>
+    <button onclick="document.getElementById('aboutModal').style.display='flex'">ℹ️ About</button>
+    <button onclick="showLeaderboard()">🏆 Leaderboard</button>
+  </div>
+
+  <footer>
+    <h2>SEVENTEEN Memory Game</h2>
+    <p>BY: Hoskwi_onX</p>
+  </footer>
+
+  <!-- About Modal -->
+  <div id="aboutModal" class="modal">
+    <div class="modal-content">
+      <h2>About the SEVENTEEN Memory Game</h2>
+      <p>This fan-made game is dedicated to the 13 amazing members of SEVENTEEN! Flip cards to match each member and test your memory skills.</p>
+      <p>Enjoy visuals and sounds while recognizing your favorite members like S.Coups, Joshua, DK, and more!</p>
+      <button onclick="document.getElementById('aboutModal').style.display='none'">❌ Close</button>
+    </div>
+  </div>
+
+  <!-- Leaderboard Modal -->
+<div id="leaderboardModal" class="modal">
+  <div class="modal-content">
+    <h2>🏆 Leaderboard</h2>
+    <div style="display: flex; justify-content: center; gap: 60px; font-size: 1.2rem; margin: 20px 0;">
+      <div>
+        <p>⏱ Time:</p>
+        <strong id="bestTime">--</strong> s
+      </div>
+      <div>
+        <p>🎯 Movement:</p>
+        <strong id="bestMoves">--</strong> moves
+      </div>
+    </div>
+    <button onclick="document.getElementById('leaderboardModal').style.display='none'">❌ Close</button>
+  </div>
+</div>
+
+
+  <script>
+    function showLeaderboard() {
+      const best = JSON.parse(localStorage.getItem("seventeen-best") || "{}");
+      document.getElementById('bestTime').textContent = best.time || "--";
+      document.getElementById('bestMoves').textContent = best.moves || "--";
+      document.getElementById('leaderboardModal').style.display = 'flex';
+    }
+  </script>
+
+</body>
+</html>
