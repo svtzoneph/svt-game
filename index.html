@@ -4,8 +4,12 @@
   <meta charset="UTF-8" />
   <title>SEVENTEEN Memory Game</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
   <style>
-  
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
@@ -19,22 +23,17 @@
       text-align: center;
     }
 
-    header {
-      margin-top: 30px;
-    }
+    header { margin-top: 30px; }
+    h1 { font-size: 2rem; color: black; }
 
-    h1 {
-      font-size: 2rem;
-      color: black;
-    }
-
-    main {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      flex: 1;
-    }
+   main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  width: 100%; /* add this */
+}
 
     button {
       background: #ff85c1;
@@ -48,9 +47,7 @@
       transition: background 0.3s ease;
     }
 
-    button:hover {
-      background: #e66cae;
-    }
+    button:hover { background: #e66cae; }
 
     .bottom-buttons {
       margin-bottom: 20px;
@@ -66,75 +63,109 @@
       text-align: center;
       border-top: 1px solid rgba(0,0,0,0.1);
       font-size: 0.95rem;
-      background: transparent; /* ← Match body by being transparent */
+      background: transparent;
     }
 
-    footer h2 {
-      margin: 0;
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: black;
-    }
+    footer h2 { margin: 0; font-size: 1.2rem; font-weight: 600; color: black; }
+    footer p { margin: 5px 0 10px; font-size: 1rem; color: black; }
 
-    footer p {
-      margin: 5px 0 10px;
-      font-size: 1rem;
-      color: black;
-    }
-
-    /* Modal Style */
     .modal {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.4); /* softer transparency */
-  backdrop-filter: blur(6px);     /* ✅ subtle background blur */
-  -webkit-backdrop-filter: blur(6px); /* for Safari */
-  display: none;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  z-index: 99;
-}
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      z-index: 99;
+    }
 
    .modal-content {
   background: #222;
-  padding: 35px 45px;
+  padding: 40px 60px;
   border-radius: 18px;
   text-align: center;
-  max-width: 500px;
+  max-width: 650px;
+  width: 90%;
   font-size: 1.1rem;
-  line-height: 1.8;
+  line-height: 1.9;
+  max-height: 90vh; /* so it doesn’t overflow on small screens */
+  overflow-y: auto; /* scroll inside modal if needed */
 }
 
-    .modal-content button {
-      margin-top: 20px;
-      padding: 10px 16px;
-      background: #ff85c1;
-      border: none;
-      color: white;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-    }
+.modal-content button {
+  margin-top: 20px;
+  padding: 10px 16px;
+  background: #ff85c1;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+}
 
-    @media (max-width: 480px) {
-      h1 {
-        font-size: 1.6rem;
-      }
+.bottom-buttons {
+  margin-bottom: 25px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 0 10px;
+  width: 100%;
+  max-width: 500px;
+}
 
-      button {
-        font-size: 1rem;
-        padding: 12px 20px;
-      }
+@media (max-width: 480px) {
+  .bottom-buttons {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
 
-      .modal-content {
-        font-size: 0.95rem;
-      }
-    }
+  button {
+    width: 100%;
+    max-width: 260px;
+  }
+  
+  .modal-content {
+    font-size: 0.9rem;
+    padding: 20px 15px;
+    width: 95%;
+    max-width: 95%;
+    line-height: 1.6;
+  }
+
+  .modal-content h2 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+  }
+
+  .modal-content button {
+    font-size: 0.8rem;
+    padding: 10px;
+    width: 100%;
+    max-width: 200px;
+  }
+
+  .leaderboard-list {
+    font-size: 0.8rem;
+  }
+
+  .bottom-buttons {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+}
   </style>
 </head>
 <body>
+  
+  <link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#ff85c1" />
 
   <header>
     <h1>SEVENTEEN Memory Game</h1>
@@ -152,46 +183,85 @@
 
   <footer>
     <h2>SEVENTEEN Memory Game</h2>
-    <p>BY: Hoskwi_onX</p>
+    <p>BY:******_***</p>
+    <p>2025/08/07</p>
   </footer>
 
-  <!-- About Modal -->
-  <div id="aboutModal" class="modal">
-    <div class="modal-content">
-      <h2>About the SEVENTEEN Memory Game</h2>
-      <p>This fan-made game is dedicated to the 13 amazing members of SEVENTEEN! Flip cards to match each member and test your memory skills.</p>
-      <p>Enjoy visuals and sounds while recognizing your favorite members like S.Coups, Joshua, DK, and more!</p>
-      <button onclick="document.getElementById('aboutModal').style.display='none'">❌ Close</button>
-    </div>
-  </div>
-
-  <!-- Leaderboard Modal -->
-<div id="leaderboardModal" class="modal">
+ <!-- About Modal -->
+<div id="aboutModal" class="modal">
   <div class="modal-content">
-    <h2>🏆 Leaderboard</h2>
-    <div style="display: flex; justify-content: center; gap: 60px; font-size: 1.2rem; margin: 20px 0;">
-      <div>
-        <p>⏱ Time:</p>
-        <strong id="bestTime">--</strong> s
-      </div>
-      <div>
-        <p>🎯 Movement:</p>
-        <strong id="bestMoves">--</strong> moves
-      </div>
-    </div>
-    <button onclick="document.getElementById('leaderboardModal').style.display='none'">❌ Close</button>
+    <h2>About the SEVENTEEN Memory Game</h2>
+    <p>This fan-made game is dedicated to the 13 amazing members of SEVENTEEN! 🃏💎 Flip cards to match each member and test your memory skills.</p>
+    <p>Tap any card to flip it, then flip another to try and match the pair. If they match, they stay open. If not, they'll flip back — remember their spots!</p>
+    <p>⏱️ A timer records how long you take to complete each level — try to finish as fast as you can!</p>
+    <p>🎯 A move counter tracks how many moves you’ve made — challenge yourself to complete the game with fewer flips!</p>
+    <p>There’s no time limit or move limit, so you can enjoy the game at your own pace.</p>
+    <p>💖 This game is completely FREE to play — enjoy and have fun, Carats!</p>
+    <button onclick="document.getElementById('aboutModal').style.display='none'">❌ Close</button>
   </div>
 </div>
 
+  <!-- Leaderboard Modal -->
+  <div id="leaderboardModal" class="modal">
+    <div class="modal-content">
+      <h2>🏆 Leaderboard</h2>
+      <div class="leaderboard-list" id="leaderboardList">Loading...</div>
+      <button onclick="document.getElementById('leaderboardModal').style.display='none'">❌ Close</button>
+    </div>
+  </div>
 
   <script>
+    // Firebase config (your config here)
+    const firebaseConfig = {
+      apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
+      authDomain: "tvnstream-b4497.firebaseapp.com",
+      databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
+      projectId: "tvnstream-b4497",
+      storageBucket: "tvnstream-b4497.appspot.com",
+      messagingSenderId: "308384754214",
+      appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
+      measurementId: "G-VFNH70R4D9"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
     function showLeaderboard() {
-      const best = JSON.parse(localStorage.getItem("seventeen-best") || "{}");
-      document.getElementById('bestTime').textContent = best.time || "--";
-      document.getElementById('bestMoves').textContent = best.moves || "--";
-      document.getElementById('leaderboardModal').style.display = 'flex';
+      const modal = document.getElementById('leaderboardModal');
+      const list = document.getElementById('leaderboardList');
+      list.innerHTML = "Loading...";
+
+      db.ref("leaderboard").once("value", snapshot => {
+        const data = snapshot.val();
+        if (!data) {
+          list.innerHTML = "No scores yet.";
+          modal.style.display = 'flex';
+          return;
+        }
+
+        const scores = Object.values(data).sort((a, b) => {
+          if (a.time === b.time) return a.moves - b.moves;
+          return a.time - b.time;
+        }).slice(0, 5);
+
+        list.innerHTML = `
+          <ul style="list-style:none;padding:0;">
+            ${scores.map(score => `
+              <li>
+                <strong>${score.name}</strong>: ⏱ ${score.time}s, 🎯 ${score.moves} moves
+              </li>
+            `).join('')}
+          </ul>
+        `;
+        modal.style.display = 'flex';
+      });
     }
   </script>
+  
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js');
+  }
+</script>
 
 </body>
 </html>
