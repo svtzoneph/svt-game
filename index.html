@@ -281,9 +281,11 @@
 
   const savedName = localStorage.getItem("playerName");
   const savedAvatar = localStorage.getItem("playerAvatar");
+  const firstTimeSaved = localStorage.getItem("firstTimeSaved");
 
   const isNew = !savedName;
   const nameChanged = savedName && savedName !== name;
+  const avatarChanged = savedAvatar && savedAvatar !== avatar;
 
   const newRef = db.ref("profiles/" + name);
   const oldRef = db.ref("profiles/" + savedName);
@@ -309,6 +311,7 @@
       await newRef.set({ name, avatar, password });
       localStorage.setItem("playerName", name);
       localStorage.setItem("playerAvatar", avatar);
+      localStorage.setItem("firstTimeSaved", "true");
       profileNameInput.disabled = true;
       closeModal('profileModal');
       alert("✅ Hoskwi_onX profile created and logged in!");
@@ -322,23 +325,59 @@
     await newRef.set({ name, avatar });
     localStorage.setItem("playerName", name);
     localStorage.setItem("playerAvatar", avatar);
+    localStorage.setItem("firstTimeSaved", "true");
     profileNameInput.disabled = true;
     closeModal('profileModal');
     alert("✅ Profile saved!");
     return;
   }
 
+  // If it's the first save (free change)
+  if (!firstTimeSaved) {
+    // Update name/score if changed
+    if (nameChanged) {
+      const taken = await newRef.get();
+      if (taken.exists()) return alert("❌ Name already taken.");
+
+      const [profileSnap, scoreSnap] = await Promise.all([oldRef.get(), scoreRef.get()]);
+      const score = scoreSnap.val()?.total || 0;
+
+      await newRef.set({ name, avatar });
+      await db.ref("scores/" + name).set({ total: score });
+      await oldRef.remove();
+      await scoreRef.remove();
+
+      localStorage.setItem("playerName", name);
+    }
+
+    if (avatarChanged) {
+      await db.ref("profiles/" + (nameChanged ? name : savedName)).update({ avatar });
+      localStorage.setItem("playerAvatar", avatar);
+    }
+
+    localStorage.setItem("firstTimeSaved", "true");
+    profileNameInput.disabled = true;
+    closeModal('profileModal');
+    alert("✅ Profile saved (first change is free)!");
+    return;
+  }
+
+  // --- After first time, all changes cost 50 stars ---
   if (nameChanged) {
-    const confirm = window.confirm("⚠️ Changing name costs 50 points. Continue?");
+    const confirm = window.confirm("⚠️ Changing name costs 50 stars. Continue?");
     if (!confirm) return;
 
     const taken = await newRef.get();
     if (taken.exists()) return alert("❌ Name already taken.");
 
     const [profileSnap, scoreSnap] = await Promise.all([oldRef.get(), scoreRef.get()]);
-    const score = Math.max(0, (scoreSnap.val()?.total || 0) - 50);
+    let currentScore = scoreSnap.val()?.total || 0;
+    if (currentScore < 50) return alert("❌ Not enough stars to change name!");
+
+    currentScore -= 50;
+
     await newRef.set({ name, avatar });
-    await db.ref("scores/" + name).set({ total: score });
+    await db.ref("scores/" + name).set({ total: currentScore });
     await oldRef.remove();
     await scoreRef.remove();
 
@@ -346,17 +385,15 @@
     localStorage.setItem("playerAvatar", avatar);
     profileNameInput.disabled = true;
     closeModal('profileModal');
-    alert(`✅ Name changed. New score: ${score}`);
+    alert(`✅ Name changed. New stars: ${currentScore}`);
     return;
   }
 
-  if (avatar !== savedAvatar) {
+  if (avatarChanged) {
     const scoreSnap = await scoreRef.get();
     let currentScore = scoreSnap.val()?.total || 0;
 
-    if (currentScore < 50) {
-      return alert("❌ Not enough stars to change avatar! You need at least 50.");
-    }
+    if (currentScore < 50) return alert("❌ Not enough stars to change avatar!");
 
     const confirm = window.confirm("⚠️ Changing avatar costs 50 stars. Continue?");
     if (!confirm) return;
