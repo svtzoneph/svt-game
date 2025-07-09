@@ -3,223 +3,253 @@
 <head>
   <meta charset="UTF-8" />
   <title>Match the Card SVT</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="manifest" href="manifest.json" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#ff85c1" />
-  <link rel="apple-touch-icon" href="svt_memory_game.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="svt_memory_game.png" />
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
   <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      height: 100vh;
-      background: linear-gradient(135deg, #f7cfe3, #c6dff5);
-      color: #333;
-      text-align: center;
-    }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f7cfe3, #c6dff5);
+  }
 
-    header { margin-top: 30px; }
-    h1 { font-size: 2rem; color: black; }
+  h1 {
+    margin-top: 30px;
+    text-align: center;
+    font-size: 2rem;
+  }
 
-    main {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      flex: 1;
-      width: 100%;
+  main {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  button {
+    background: #ff85c1;
+    color: white;
+    border: none;
+    padding: 15px 25px;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+
+  button:hover {
+    background: #e66cae;
+    transform: scale(1.05);
+  }
+
+  .bottom-buttons {
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    width: 100%;
+  }
+
+  footer {
+    text-align: center;
+    padding: 15px;
+    font-size: 0.9rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    width: 100%;
+  }
+
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 99;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+
+.modal-content {
+  background: #222;
+  color: white;
+  padding: 30px;
+  border-radius: 15px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh; /* restrict height */
+  overflow-y: auto;  /* allow vertical scroll */
+  text-align: center;
+  box-sizing: border-box;
+}
+
+  .avatar-option {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid transparent;
+    cursor: pointer;
+  }
+
+  .avatar-option:hover {
+    border-color: #ff85c1;
+    transform: scale(1.1);
+  }
+
+  #avatarPreview {
+    margin-top: 10px;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 3px solid #ff85c1;
+  }
+
+  input {
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 300px;
+    margin: 10px 0;
+    border: none;
+    outline: none;
+  }
+
+  .leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+
+  .leaderboard-table th,
+  .leaderboard-table td {
+    padding: 10px;
+    color: white;
+  }
+
+  .leaderboard-table thead {
+    background: #ff85c1;
+  }
+
+  .leaderboard-table tbody tr:nth-child(even) {
+    background: #333;
+  }
+
+  .highlight {
+    background-color: gold;
+    color: black;
+  }
+  
+  .profile-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+  @media (max-width: 500px) {
+    h1 {
+      font-size: 1.6rem;
     }
 
     button {
-      background: #ff85c1;
-      border: none;
-      padding: 15px 25px;
-      color: white;
-      font-size: 1.1rem;
-      border-radius: 10px;
-      margin: 10px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-
-    button:hover { background: #e66cae; }
-
-    .bottom-buttons {
-      margin-bottom: 25px;
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 12px;
-      padding: 0 10px;
-      width: 100%;
-      max-width: 500px;
-    }
-
-    footer {
-      width: 100%;
-      padding: 15px 10px 20px;
-      text-align: center;
-      border-top: 1px solid rgba(0,0,0,0.1);
-      font-size: 0.95rem;
-      background: transparent;
-    }
-
-    footer h2 { margin: 0; font-size: 1.2rem; font-weight: 600; color: black; }
-    footer p { margin: 5px 0 10px; font-size: 1rem; color: black; }
-
-    .modal {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(6px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 99;
+      width: 90%;
+      font-size: 1rem;
     }
 
     .modal-content {
-      background: #222;
-      padding: 40px 30px;
-      border-radius: 18px;
-      text-align: center;
-      max-width: 700px;
-      width: 95%;
-      font-size: 1.1rem;
-      line-height: 1.9;
-      max-height: 90vh;
-      overflow-y: auto;
-      color: white;
-    }
-
-    .modal-content button {
-      margin-top: 20px;
-      padding: 10px 16px;
-      background: #ff85c1;
-      border: none;
-      color: white;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-
-    .leaderboard-scroll {
-      max-height: 350px;
-      overflow-y: auto;
-      margin-top: 10px;
-      border-radius: 10px;
-    }
-
-    .leaderboard-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 1rem;
-    }
-
+  background: #222;
+  color: white;
+  padding: 30px;
+  border-radius: 15px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh; /* restrict height */
+  overflow-y: auto;  /* allow vertical scroll */
+  text-align: center;
+  box-sizing: border-box;
+}
     .leaderboard-table th,
     .leaderboard-table td {
-      padding: 12px;
-      text-align: center;
-      color: #fff;
+      font-size: 0.85rem;
+      padding: 8px;
     }
 
-    .leaderboard-table thead {
-      background-color: #ff85c1;
-      position: sticky;
-      top: 0;
+    #avatarPreview {
+      width: 80px;
+      height: 80px;
     }
 
-    .leaderboard-table tbody tr:nth-child(odd) {
-      background-color: #3d3d3d;
+    .avatar-option {
+      width: 50px;
+      height: 50px;
     }
-
-    .leaderboard-table tbody tr:nth-child(even) {
-      background-color: #2c2c2c;
-    }
-
-    .leaderboard-table tr.highlight {
-      background-color: #ffd700 !important;
-      color: black;
-    }
-
-    @media (max-width: 480px) {
-      .modal-content {
-        font-size: 0.9rem;
-        padding: 20px 15px;
-        width: 95%;
-      }
-
-      .modal-content h2 {
-        font-size: 1.2rem;
-        margin-bottom: 10px;
-      }
-
-      .modal-content button {
-        font-size: 0.8rem;
-        padding: 10px;
-        width: 100%;
-        max-width: 200px;
-      }
-
-      .bottom-buttons {
-        flex-direction: column;
-        align-items: center;
-        gap: 8px;
-      }
-
-      button {
-        width: 100%;
-        max-width: 260px;
-      }
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
 
-  <header>
-    <h1>Match the Card SVT</h1>
-  </header>
+  <h1>Match the Card SVT</h1>
 
   <main>
-    <button onclick="location.href='game.html'">🎮 Start Game</button>
+    <button onclick="startGame()">🎮 Start Game</button>
   </main>
 
   <div class="bottom-buttons">
-    <button onclick="alert('Adjust theme and audio in the game screen.')">⚙️ Settings</button>
+    <button onclick="document.getElementById('profileModal').style.display='flex'">👤 Profile</button>
+    <button onclick="document.getElementById('leaderboardModal').style.display='flex'; loadLeaderboard();">🏆 Leaderboard</button>
     <button onclick="document.getElementById('aboutModal').style.display='flex'">ℹ️ About</button>
-    <button onclick="showLeaderboard()">🏆 Leaderboard</button>
   </div>
 
   <footer>
-    <h2>Match the Card SVT</h2>
-    <p>BY: ******_***</p>
+    <p>Made for CARATs 💎 | Match the Card SVT</p>
   </footer>
 
-  <!-- About Modal -->
-  <div id="aboutModal" class="modal">
+  <!-- Profile Modal -->
+  <div id="profileModal" class="modal">
     <div class="modal-content">
-      <h2>About Flip the Card SVT</h2>
-      <p>This fan-made game is made for CARATS🃏💎 Flip cards to match each member and test your memory skills.</p>
-      <p>⏱️ A timer records how long you take — try to finish fast!</p>
-      <p>🎯 A move counter tracks how many flips you made.</p>
-      <p><strong>🛠️ Upcoming Features:</strong></p>
-      <ul style="text-align: left; padding-left: 20px;">
-        <li>🔓 Multiple Levels</li>
-        <li>⏱️ Time Challenges</li>
-        <li>🎨 Custom Themes</li>
-      </ul>
-      <button onclick="document.getElementById('aboutModal').style.display='none'">❌ Close</button>
+      <h2>Edit Profile</h2>
+      <input type="text" id="profileName" placeholder="Enter your name" /><br>
+      <p>Select Avatar:</p>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
+        <img src="https://uploads.onecompiler.io/432zqmf3k/43mwmcrmj/miniteen10-768x768.png" class="avatar-option" onclick="selectAvatar(this)">
+        <img src="https://uploads.onecompiler.io/432zqmf3k/43mwmcrmj/miniteen13-768x768.png" class="avatar-option" onclick="selectAvatar(this)">
+        <img src="https://uploads.onecompiler.io/432zqmf3k/43mwmcrmj/miniteen9-768x768.png" class="avatar-option" onclick="selectAvatar(this)">
+        <img src="https://uploads.onecompiler.io/432zqmf3k/43mwmcrmj/miniteen8-768x768.png" class="avatar-option" onclick="selectAvatar(this)">
+        <img src="https://uploads.onecompiler.io/432zqmf3k/43mwmcrmj/miniteen11-768x768.png" class="avatar-option" onclick="selectAvatar(this)">
+        <img src="https://uploads.onecompiler.io/432zqmf3k/43mwmcrmj/miniteen12-768x768.png" class="avatar-option" onclick="selectAvatar(this)">
+        <img src="https://uploads.onecompiler.io/432zqmf3k/43mwmcrmj/miniteen7-768x768.png" class="avatar-option" onclick="selectAvatar(this)">
+        <img src="https://uploads.onecompiler.io/432zqmf3k/43mwmcrmj/miniteen6-768x768.png" class="avatar-option" onclick="selectAvatar(this)">
+        <img src="https://uploads.onecompiler.io/432zqmf3k/43mwmcrmj/miniteen5-768x768.png" class="avatar-option" onclick="selectAvatar(this)">
+        <img src="https://uploads.onecompiler.io/432zqmf3k/43mwmcrmj/miniteen4-768x768.png" class="avatar-option" onclick="selectAvatar(this)">
+        <img src="https://uploads.onecompiler.io/432zqmf3k/43mwmcrmj/miniteen3-768x768.png" class="avatar-option" onclick="selectAvatar(this)">
+        <img src="https://uploads.onecompiler.io/432zqmf3k/43mwmcrmj/miniteen2-768x768.png" class="avatar-option" onclick="selectAvatar(this)">
+        <img src="https://uploads.onecompiler.io/432zqmf3k/43mwmcrmj/miniteen1-800x800.png" class="avatar-option" onclick="selectAvatar(this)">
+      </div>
+      <p>Selected Avatar:</p>
+      <img id="avatarPreview" src="https://uploads.onecompiler.io/432zqmf3k/43mwmcrmj/miniteen10-768x768.png" alt="Preview" />
+      <br><br>
+      <div class="profile-buttons">
+  <button onclick="saveProfile()">💾 Save</button>
+  <button onclick="document.getElementById('profileModal').style.display='none'">❌ Close</button>
+</div>
     </div>
   </div>
 
@@ -227,79 +257,165 @@
   <div id="leaderboardModal" class="modal">
     <div class="modal-content">
       <h2>🏆 Leaderboard</h2>
-      <div class="leaderboard-scroll">
-        <table class="leaderboard-table">
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th>Name</th>
-              <th>Time (s)</th>
-              <th>Moves</th>
-            </tr>
-          </thead>
-          <tbody id="leaderboardList">
-            <tr><td colspan="4">Loading...</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <button onclick="document.getElementById('leaderboardModal').style.display='none'">❌ Close</button>
+      <table class="leaderboard-table">
+        <thead><tr><th>Rank</th><th>Name</th><th>Level</th><th>Score</th></tr></thead>
+        <tbody id="leaderboardList">
+          <tr><td colspan="4">Loading...</td></tr>
+        </tbody>
+      </table>
+      <button onclick="document.getElementById('leaderboardModal').style.display='none'">Close</button>
     </div>
   </div>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
-      authDomain: "tvnstream-b4497.firebaseapp.com",
-      databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
-      projectId: "tvnstream-b4497",
-      storageBucket: "tvnstream-b4497.appspot.com",
-      messagingSenderId: "308384754214",
-      appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
-      measurementId: "G-VFNH70R4D9"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+  <!-- About Modal -->
+  <div id="aboutModal" class="modal">
+    <div class="modal-content">
+      <h2>About the Game</h2>
+      <p><strong>Match the Card SVT</strong> is a fun and challenging memory game made especially for SEVENTEEN fans! 🩷✨</p>
 
-    function showLeaderboard() {
-      const modal = document.getElementById('leaderboardModal');
-      const list = document.getElementById('leaderboardList');
-      list.innerHTML = "<tr><td colspan='4'>Loading...</td></tr>";
+  <p>Your goal is simple: flip the cards and find the matching pairs. If the two cards you flip are a match, they stay open. If not, they’ll flip back, and you’ll need to remember their positions for later.</p>
 
-      db.ref("leaderboard").once("value", snapshot => {
-        const data = snapshot.val();
-        if (!data) {
-          list.innerHTML = "<tr><td colspan='4'>No scores yet.</td></tr>";
-          modal.style.display = 'flex';
-          return;
-        }
+  <p>But that’s not all — the game gets harder as you progress!</p>
 
-        const scores = Object.values(data).sort((a, b) => {
-          if (a.time === b.time) return a.moves - b.moves;
-          return a.time - b.time;
-        });
+  <ul>
+    🧠 100 exciting levels to complete, with increasing difficulty!</li>
+    💡 Test your memory, speed, and focus!</li>
+    💎 The faster and smarter you play, the higher your score!</li>
+    🥇 Compete on the leaderboard to earn ranks and medals!</li>
+    🔓 Unlock new levels as you match your way to the top!</li>
+  </ul>
 
-        list.innerHTML = scores.map((score, index) => {
-          const rank = index + 1;
-          const isYou = score.name.toLowerCase() === "you";
-          const medal = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : rank;
+  <p><strong>Match the Card SVT</strong> is a completely free and fun way to boost your memory and focus while challenging yourself through 100 exciting levels!</p>
+  <p><em>🛠️ More updates, features, and surprises will be added soon — stay tuned!</em></p>
+      <button onclick="document.getElementById('aboutModal').style.display='none'">Close</button>
+    </div>
+  </div>
 
-          return `
-            <tr class="${isYou ? 'highlight' : ''}">
-              <td>${medal}</td>
-              <td>${score.name}</td>
-              <td>${score.time}</td>
-              <td>${score.moves}</td>
-            </tr>
-          `;
-        }).join('');
+ <script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
+    authDomain: "tvnstream-b4497.firebaseapp.com",
+    databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
+    projectId: "tvnstream-b4497",
+    storageBucket: "tvnstream-b4497.appspot.com",
+    messagingSenderId: "308384754214",
+    appId: "1:308384754214:web:2938e76cd29b288f75d4e7"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
 
-        modal.style.display = 'flex';
-      });
+  const profileNameInput = document.getElementById("profileName");
+  const avatarPreview = document.getElementById("avatarPreview");
+
+  // On load, fill profile if already saved
+  window.onload = async () => {
+    const savedName = localStorage.getItem("playerName");
+    const savedAvatar = localStorage.getItem("playerAvatar");
+
+    if (savedName) {
+      profileNameInput.value = savedName;
+      profileNameInput.readOnly = true; // prevent name change
+      avatarPreview.src = savedAvatar || avatarPreview.src;
+
+      // Optionally fetch from Firebase to update avatar
+      const snap = await db.ref("profiles/" + savedName).get();
+      if (snap.exists()) {
+        const profile = snap.val();
+        avatarPreview.src = profile.avatar;
+        localStorage.setItem("playerAvatar", profile.avatar);
+      }
+    }
+  };
+
+  function selectAvatar(img) {
+    avatarPreview.src = img.src;
+  }
+
+  async function saveProfile() {
+    const name = profileNameInput.value.trim();
+    const avatar = avatarPreview.src;
+
+    if (!name) return alert("Please enter your name!");
+
+    const profileRef = db.ref("profiles/" + name);
+    const snap = await profileRef.get();
+
+    // Name already saved (readonly), just update avatar
+    if (profileNameInput.readOnly) {
+      await profileRef.update({ avatar });
+      localStorage.setItem("playerAvatar", avatar);
+      alert("✅ Avatar updated!");
+      document.getElementById("profileModal").style.display = 'none';
+      return;
     }
 
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js');
+    // Name not used yet → save full profile
+    if (snap.exists()) {
+      alert("❌ Name already taken. Please choose another.");
+      return;
     }
-  </script>
+
+    await profileRef.set({ name, avatar });
+    localStorage.setItem("playerName", name);
+    localStorage.setItem("playerAvatar", avatar);
+    alert("✅ Profile saved!");
+    profileNameInput.readOnly = true;
+    document.getElementById("profileModal").style.display = 'none';
+  }
+
+  function startGame() {
+    const name = localStorage.getItem("playerName");
+    if (!name) return alert("Please save your profile first!");
+    window.location.href = "game.html?playerName=" + encodeURIComponent(name);
+  }
+
+ function loadLeaderboard() {
+  const list = document.getElementById("leaderboardList");
+  list.innerHTML = `<tr><td colspan="4">Loading...</td></tr>`;
+
+  const scoresRef = db.ref("scores");
+  const progressRef = db.ref("progress");
+
+  Promise.all([
+    scoresRef.once("value"),
+    progressRef.once("value")
+  ]).then(([scoreSnap, progressSnap]) => {
+    const scores = scoreSnap.val() || {};
+    const progress = progressSnap.val() || {};
+
+    const combined = Object.entries(scores).map(([name, data]) => ({
+      name,
+      score: data.total || 0,
+      level: progress[name]?.currentLevel - 1 || 1
+    }));
+
+    combined.sort((a, b) => b.score - a.score);
+
+    if (combined.length === 0) {
+      list.innerHTML = `<tr><td colspan="4">No scores yet.</td></tr>`;
+      return;
+    }
+
+    list.innerHTML = combined.map((entry, i) => {
+      let rankDisplay = i + 1;
+      if (i === 0) rankDisplay = '🥇';
+      else if (i === 1) rankDisplay = '🥈';
+      else if (i === 2) rankDisplay = '🥉';
+
+      return `
+        <tr>
+          <td>${rankDisplay}</td>
+          <td>${entry.name}</td>
+          <td>${entry.level}</td>
+          <td>${entry.score}</td>
+        </tr>
+      `;
+    }).join('');
+  });
+}
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js');
+  }
+</script>
 </body>
 </html>
