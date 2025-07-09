@@ -191,21 +191,29 @@
     </div>
   </div>
 
-  <!-- About Modal -->
-  <div id="aboutModal" class="modal">
-    <div class="modal-content">
-      <h2>About the Game</h2>
-      <p><strong>Match the Card SVT</strong> is a memory card game for CARATs (SEVENTEEN fans)! Match cards, complete levels, and earn a spot on the leaderboard!</p>
-      <ul style="text-align:left;">
-        <li>🧠 100 exciting levels</li>
-        <li>💡 Improve memory & focus</li>
-        <li>💎 Score based on speed & moves</li>
-        <li>🥇 Top ranks earn medals</li>
-        <li>🔓 Unlock new levels</li>
-      </ul>
-      <button onclick="closeModal('aboutModal')">Close</button>
-    </div>
+<!-- About Modal -->
+<div id="aboutModal" class="modal">
+  <div class="modal-content">
+    <h2>About the Game</h2>
+    <p><strong>Match the Card SVT</strong> is a memory card game made especially for CARATs (SEVENTEEN fans)! 💎✨</p>
+
+    <p>Your goal is simple: flip the cards and find the matching pairs. If the two cards you flip are a match, they stay open. If not, they’ll flip back, and you’ll need to remember their positions for later.</p>
+
+    <p>But that’s not all — the game gets harder as you progress!</p>
+
+    <ul style="text-align: left; max-width: 500px; margin: 0 auto; padding: 0 10px;">
+      <li>🧠 100 levels to complete</li>
+      <li>💎 Score based on speed and moves</li>
+      <li>🥇 Top players earn star and medals</li>
+      <li>🔓 Unlock new levels as you advance</li>
+    </ul>
+
+    <p style="margin-top: 20px; font-weight: bold;">🎮 Match the Card SVT is 100% free to play, no sign-ups, no payments, just fun!</p>
+
+    <p><em>🛠️ More updates, feature will be added soon — stay tuned!</em></p>
+    <button onclick="document.getElementById('aboutModal').style.display='none'">Close</button>
   </div>
+</div>
 
 <script>
   const firebaseConfig = {
