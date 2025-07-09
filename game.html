@@ -4,41 +4,22 @@
   <meta charset="UTF-8" />
   <title>Match the Card SVT</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="manifest" href="manifest.json" />
-<meta name="theme-color" content="#ff85c1" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#ff85c1" />
   <link rel="apple-touch-icon" href="svt_memory_game.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-  
-  <!-- Firebase SDKs -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
   <style>
-    :root {
-      --primary: #ff85c1;
-      --bg-light: #ffffff;
-      --bg-dark: #1a1a1a;
-      --card-bg: #fff;
-      --text-color: #000;
-    }
-
-    [data-theme="dark"] {
-      --bg-light: #1a1a1a;
-      --card-bg: #2b2b2b;
-      --text-color: #fefefe;
-    }
-
-    * {
-      box-sizing: border-box;
-      font-family: 'Segoe UI', sans-serif;
-      transition: all 0.3s ease;
-    }
-
     body {
-      background: linear-gradient(135deg, #f7cfe3, #c6dff5);
-      color: var(--text-color);
+      font-family: 'Segoe UI', sans-serif;
       margin: 0;
+      background: linear-gradient(135deg, #f7cfe3, #c6dff5);
+      color: #333;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -47,72 +28,57 @@
 
     h1 {
       margin-top: 20px;
-      font-size: 1.6rem;
-      text-align: center;
+      font-size: 2rem;
+    }
+
+    .player-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 10px;
+    }
+
+    .player-info img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
     }
 
     .top-bar {
       display: flex;
-      gap: 1rem;
-      align-items: center;
-      justify-content: center;
+      gap: 20px;
       margin: 10px;
-    }
-
-    .settings-toggle {
-      position: relative;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      margin: 20px 0 10px;
-      z-index: 30;
-    }
-
-    .settings-panel {
-  position: absolute;
-  bottom: 100px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 20;
-  display: none;
-  padding: 16px 20px;
-  border-radius: 15px;
-  background: rgba(0, 0, 0, 0.45); /* translucent dark */
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-  color: #fff;
-  font-size: 0.95rem;
-  max-width: 90%;
-  text-align: left;
-}
-
-    .settings-panel label {
-      display: block;
-      margin-bottom: 8px;
-    }
-
-    .settings-panel input[type="range"] {
-      width: 100%;
+      font-size: 1.1rem;
     }
 
     .board {
       display: grid;
-      gap: 6px;
+      gap: 14px;
       width: 90%;
       max-width: 1000px;
-      margin: 10px auto;
-      grid-template-columns: repeat(7, 1fr);
+      margin-top: 10px;
+    }
+
+    @media (max-width: 600px) {
+      .board {
+        grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+      }
+    }
+
+    @media (min-width: 601px) {
+      .board {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      }
     }
 
     .card {
-      background: var(--card-bg);
-      border-radius: 8px;
-      overflow: hidden;
+      background: white;
       aspect-ratio: 1/1;
+      border-radius: 12px;
+      overflow: hidden;
       cursor: pointer;
-      position: relative;
       perspective: 1000px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
 
     .card-inner {
@@ -135,7 +101,7 @@
     }
 
     .card-back {
-      background: url('https://uploads.onecompiler.io/43ddry4jt/43q3zhrvq/create%20a%20new%20logo%20fo.png') center center / cover no-repeat;
+      background: url('https://uploads.onecompiler.io/43ddry4jt/43q3zhrvq/create%20a%20new%20logo%20fo.png') center/cover no-repeat;
     }
 
     .card-front {
@@ -148,145 +114,86 @@
       object-fit: cover;
     }
 
-    button {
-      background: var(--primary);
-      color: white;
-      padding: 10px 16px;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-
-    .leaderboard {
-      margin-top: 10px;
-      text-align: center;
-      max-width: 400px;
-    }
-
     .modal {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.4); /* softer overlay */
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 99;
-  color: white;
-}
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99;
+    }
 
-.modal-content {
-  background: rgba(34, 34, 34, 0.7); /* translucent dark background */
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  padding: 25px 20px;
-  border-radius: 15px;
-  text-align: center;
-  width: 90%;
-  max-width: 400px;
-  font-size: 1rem;
-  color: #fff;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-}
-    audio { display: none; }
-
-      footer {
-      width: 100%;
-      padding: 15px 10px 20px;
+    .modal-content {
+      background: linear-gradient(135deg, #f7cfe3, #c6dff5);
+      padding: 25px;
+      border-radius: 10px;
       text-align: center;
-      border-top: 1px solid rgba(0,0,0,0.1);
-      font-size: 0.95rem;
-      background: transparent; /* ← Match body by being transparent */
+      width: 95%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
     }
 
-    footer h2 {
-      margin: 0;
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: black;
+    .modal-content h2 {
+      margin-bottom: 15px;
     }
 
-    footer p {
-      margin: 5px 0 10px;
+    button {
+      background: #ff85c1;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin: 10px 5px;
+      border-radius: 8px;
+      cursor: pointer;
       font-size: 1rem;
-      color: black;
     }
 
-    @media (max-width: 768px) {
-      .board {
-        grid-template-columns: repeat(5, 1fr);
-      }
-    }
-
-    @media (max-width: 480px) {
-      .board {
-        grid-template-columns: repeat(4, 1fr);
-      }
+    .level-button.locked {
+      background-color: gray;
+      cursor: not-allowed;
     }
   </style>
 </head>
-<body data-theme="light">
-
-  <!-- START MODAL -->
-  <div id="startModal" class="modal">
-    <div class="modal-content">
-      <h2>Flip the cards to match all 13 members!</h2>
-      <button onclick="startGame()">Start</button>
-    </div>
-  </div>
-
-<!-- WIN MODAL -->
-<div id="winModal" class="modal" style="display: none;">
-  <div class="modal-content">
-    <h2>🎉 Congratulations!</h2>
-    <p>You won in <strong><span id="finalTime"></span></strong> seconds and <strong><span id="finalMoves"></span></strong> moves!</p>
-    <input id="playerNameInput" type="text" placeholder="Enter your name" style="margin-top: 10px; padding: 8px; width: 90%; border-radius: 8px; border: none;"><br><br>
-    <button onclick="submitScore()">Submit</button>
-    <button onclick="startGame(); winModal.style.display='none'">Play Again</button>
-    <button onclick="window.location.href='index.html'">Home</button>
-  </div>
-</div>
-
+<body>
   <h1>Match the Card SVT</h1>
 
   <div class="top-bar">
     <span>⏱ Time: <span id="timer">0</span>s</span>
     <span>🎯 Moves: <span id="moves">0</span></span>
+    <span>⭐ Score: <span id="topScore">1</span></span>
   </div>
 
   <div class="board" id="board"></div>
 
- <div class="settings-toggle">
-    <button onclick="toggleSettings()">⚙️</button>
+  <!-- Start Modal -->
+  <div id="startModal" class="modal">
+    <div class="modal-content" id="levelList">
+      <h2>Select Level</h2>
+      <div id="levelButtons"></div>
+    </div>
   </div>
   
-<!-- ✅ KEEP ONLY THIS ONE -->
-<div class="settings-panel" id="settingsPanel">
-  <label>🔊 BG Music
-    <input type="range" id="bgVolume" min="0" max="1" step="0.01" value="1">
-    <input type="checkbox" id="bgToggle" checked> On
-  </label>
-  <label>🔉 Flip Sound
-    <input type="range" id="flipVolume" min="0" max="1" step="0.01" value="1">
-    <input type="checkbox" id="flipToggle" checked> On
-  </label>
-  <label>🎵 Match Sound
-    <input type="range" id="matchVolume" min="0" max="1" step="0.01" value="1">
-    <input type="checkbox" id="matchToggle" checked> On
-  </label>
-</div>
-
-  <div class="settings-panel" id="settingsPanel">
-    <label>🔊 BG Music <input type="checkbox" id="bgToggle" checked></label><br>
-    <label>🔉 Flip Sound <input type="checkbox" id="flipToggle" checked></label><br>
-    <label>🎵 Match Sound <input type="checkbox" id="matchToggle" checked></label>
+  <div class="player-info">
+    <img id="gameAvatar" src="" alt="Avatar">
+    <span id="gameName"></span>
   </div>
 
+  <!-- Win Modal -->
+  <div id="winModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <h2>🎉 Congratulations!</h2>
+      <p>You won in <strong><span id="finalTime"></span></strong> seconds and <strong><span id="finalMoves"></span></strong> moves!</p>
+      <p>🏆 Score: <strong id="finalScore"></strong></p>
+      <p id="playerDisplay">👤 <strong id="playerNameLabel"></strong></p>
+      <button onclick="nextLevel()">Next Level</button>
+      <button onclick="location.reload()">Home</button>
+    </div>
+  </div>
 
-  <!-- Audio -->
+  <!-- Sounds -->
   <audio id="flipSound" src="/audio/flip.mp3"></audio>
   <audio id="matchSound" src="/audio/match.mp3"></audio>
   <audio id="bgMusic" src="/audio/bg.mp3" autoplay loop></audio>
@@ -299,57 +206,79 @@
       projectId: "tvnstream-b4497",
       storageBucket: "tvnstream-b4497.appspot.com",
       messagingSenderId: "308384754214",
-      appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
-      measurementId: "G-VFNH70R4D9"
+      appId: "1:308384754214:web:2938e76cd29b288f75d4e7"
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    const members = [
-      "scoups", "jeonghan", "joshua", "jun", "hoshi", "wonwoo", "woozi",
-      "the8", "mingyu", "dk", "seungkwan", "vernon", "dino"
-    ];
+    const members = ["scoups", "jeonghan", "joshua", "jun", "hoshi", "wonwoo", "woozi", "the8", "mingyu", "dk", "seungkwan", "vernon", "dino"];
 
     const board = document.getElementById('board');
     const timerEl = document.getElementById('timer');
     const movesEl = document.getElementById('moves');
-    const bestListEl = document.getElementById('bestList');
     const flipSound = document.getElementById('flipSound');
     const matchSound = document.getElementById('matchSound');
     const bgMusic = document.getElementById('bgMusic');
-    const startModal = document.getElementById('startModal');
     const winModal = document.getElementById('winModal');
     const finalTime = document.getElementById('finalTime');
     const finalMoves = document.getElementById('finalMoves');
+    const finalScore = document.getElementById('finalScore');
+    const playerNameLabel = document.getElementById('playerNameLabel');
+    const gameName = document.getElementById('gameName');
+    const gameAvatar = document.getElementById('gameAvatar');
+    const topScore = document.getElementById('topScore');
 
     let cards = [], flipped = [], matched = 0, timer = 0, moves = 0, interval;
+    let currentLevel = 1, maxLevel = 100;
+    let totalScore = 1;
+
+    const storedName = localStorage.getItem('playerName') || "Anonymous";
+    const storedAvatar = localStorage.getItem('playerAvatar') || "/avatars/miniteen1.png";
+    gameName.textContent = storedName;
+    gameAvatar.src = storedAvatar;
 
     function createCard(name) {
       const card = document.createElement('div');
       card.className = 'card';
       card.dataset.name = name;
-      card.innerHTML = `
-        <div class="card-inner">
-          <div class="card-back"></div>
-          <div class="card-front"><img src="/img/${name}.jpg" alt="${name}"></div>
-        </div>
-      `;
+      card.innerHTML = `<div class="card-inner">
+        <div class="card-back"></div>
+        <div class="card-front"><img src="/img/${name}.jpg" alt="${name}"></div>
+      </div>`;
       card.addEventListener('click', () => flipCard(card));
       return card;
     }
 
-    function startGame() {
-      winModal.style.display = "none";
-      startModal.style.display = "none";
+    function generateLevelButtons(unlockedLevel) {
+      const container = document.getElementById("levelButtons");
+      container.innerHTML = "";
+      for (let i = 1; i <= maxLevel; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i;
+        if (i > unlockedLevel) {
+          btn.classList.add("level-button", "locked");
+        } else {
+          btn.classList.add("level-button");
+          btn.onclick = () => startLevel(i);
+        }
+        container.appendChild(btn);
+      }
+    }
+
+    function startLevel(level) {
+      currentLevel = level;
+      document.getElementById('startModal').style.display = 'none';
+      winModal.style.display = 'none';
       board.innerHTML = '';
-      cards = [...members, ...members].sort(() => 0.5 - Math.random());
+      const levelSize = Math.min(members.length, 3 + level);
+      cards = [...members.slice(0, levelSize), ...members.slice(0, levelSize)].sort(() => 0.5 - Math.random());
       cards.forEach(name => board.appendChild(createCard(name)));
       flipped = [];
       matched = 0;
       timer = 0;
       moves = 0;
-      movesEl.textContent = 0;
       timerEl.textContent = 0;
+      movesEl.textContent = 0;
       clearInterval(interval);
       interval = setInterval(() => {
         timer++;
@@ -359,7 +288,7 @@
 
     function flipCard(card) {
       if (card.classList.contains('flipped') || flipped.length >= 2) return;
-      if (document.getElementById('flipToggle').checked) flipSound.play();
+      flipSound.play();
       card.classList.add('flipped');
       flipped.push(card);
       if (flipped.length === 2) {
@@ -367,7 +296,7 @@
         movesEl.textContent = moves;
         const [a, b] = flipped;
         if (a.dataset.name === b.dataset.name) {
-          if (document.getElementById('matchToggle').checked) matchSound.play();
+          matchSound.play();
           matched += 2;
           flipped = [];
           if (matched === cards.length) gameWin();
@@ -381,139 +310,54 @@
       }
     }
 
-function gameWin() {
-  clearInterval(interval);
+    function gameWin() {
+      clearInterval(interval);
+      setTimeout(() => {
+        finalTime.textContent = timer;
+        finalMoves.textContent = moves;
+        playerNameLabel.textContent = storedName;
 
-  // Delay to ensure all animations complete
-  setTimeout(() => {
-    finalTime.textContent = timer;
-    finalMoves.textContent = moves;
+        const score = Math.max(50, 100 - (timer * 2 + moves));
+        totalScore += score;
+        topScore.textContent = totalScore;
+        finalScore.textContent = totalScore;
+        winModal.style.display = "flex";
 
-    // Check rank before submitting
-    db.ref("leaderboard").once("value", snapshot => {
-      const data = snapshot.val() || {};
-      const scores = Object.values(data);
+        db.ref("leaderboard/" + storedName + "_level" + currentLevel).set({
+          name: storedName,
+          avatar: storedAvatar,
+          level: currentLevel,
+          time: timer,
+          moves: moves,
+          score: score,
+          totalScore: totalScore,
+          timestamp: Date.now()
+        });
 
-      // Add current run to comparison pool (not yet saved)
-      scores.push({
-        name: "You",
-        time: timer,
-        moves: moves
-      });
-
-      // Sort and find rank
-      scores.sort((a, b) => {
-        if (a.time === b.time) return a.moves - b.moves;
-        return a.time - b.time;
-      });
-
-      const rank = scores.findIndex(score => score.name === "You") + 1;
-
-      // Show rank
-      const rankMsg = document.createElement('p');
-      rankMsg.textContent = `🏆 You are currently ranked #${rank} on the leaderboard!`;
-      const winModal = document.getElementById('winModal');
-      const existingMsg = winModal.querySelector('.rank-msg');
-      if (existingMsg) existingMsg.remove();
-      rankMsg.className = 'rank-msg';
-      winModal.querySelector('.modal-content').insertBefore(rankMsg, document.getElementById("playerNameInput"));
-
-      winModal.style.display = "flex";
-      document.getElementById('playerNameInput').focus();
-    });
-  }, 500);
-}
-
-
-function submitScore() {
-  const playerName = document.getElementById("playerNameInput").value.trim();
-  if (!playerName) {
-    alert("Please enter your name!");
-    return;
-  }
-
-  db.ref("leaderboard").push({
-    name: playerName,
-    time: timer,
-    moves: moves,
-    timestamp: Date.now()
-  });
-
-  document.getElementById("winModal").style.display = "none";
-  loadLeaderboard();
-}
-
-    function loadLeaderboard() {
-      db.ref("leaderboard").once("value", snapshot => {
-        const data = snapshot.val();
-        if (!data) {
-          bestListEl.innerHTML = "No scores yet.";
-          return;
-        }
-        const scores = Object.values(data).sort((a, b) => {
-          if (a.time === b.time) return a.moves - b.moves;
-          return a.time - b.time;
-        }).slice(0, 5);
-        bestListEl.innerHTML = `<ul style="list-style:none;padding:0;">` +
-          scores.map(score =>
-            `<li>${score.name}: ⏱ ${score.time}s, 🎯 ${score.moves} moves</li>`
-          ).join('') + `</ul>`;
-      });
+        db.ref("scores/" + storedName).set({ total: totalScore });
+        db.ref("progress/" + storedName).set({ currentLevel: currentLevel + 1 });
+      }, 500);
     }
 
-    function toggleTheme() {
-      const current = document.body.dataset.theme;
-      document.body.dataset.theme = current === "dark" ? "light" : "dark";
+    function nextLevel() {
+      winModal.style.display = "none";
+      startLevel(currentLevel + 1);
     }
 
-    function toggleSettings() {
-      const panel = document.getElementById('settingsPanel');
-      panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
-    }
-
-    document.getElementById('bgToggle').addEventListener('change', e => {
-      bgMusic.muted = !e.target.checked;
+    db.ref("progress/" + storedName).once("value").then(snap => {
+      const unlocked = snap.val()?.currentLevel || 1;
+      generateLevelButtons(unlocked);
     });
 
-    loadLeaderboard();
+    db.ref("scores/" + storedName).once("value").then(snapshot => {
+      totalScore = snapshot.val()?.total || 1;
+      topScore.textContent = totalScore;
+    });
+
+    bgMusic.volume = 1;
+    flipSound.volume = 1;
+    matchSound.volume = 1;
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
   </script>
-  
-  <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js');
-  }
-
-  // ✅ Volume Sliders - Adjust volume live
-  document.getElementById('bgVolume').addEventListener('input', (e) => {
-    bgMusic.volume = parseFloat(e.target.value);
-  });
-
-  document.getElementById('flipVolume').addEventListener('input', (e) => {
-    flipSound.volume = parseFloat(e.target.value);
-  });
-
-  document.getElementById('matchVolume').addEventListener('input', (e) => {
-    matchSound.volume = parseFloat(e.target.value);
-  });
-
-  // ✅ Mute Checkboxes - Toggle mute
-  document.getElementById('bgToggle').addEventListener('change', (e) => {
-    bgMusic.muted = !e.target.checked;
-  });
-
-  document.getElementById('flipToggle').addEventListener('change', (e) => {
-    flipSound.muted = !e.target.checked;
-  });
-
-  document.getElementById('matchToggle').addEventListener('change', (e) => {
-    matchSound.muted = !e.target.checked;
-  });
-
-  // ✅ Set initial volumes
-  bgMusic.volume = 1;
-  flipSound.volume = 1;
-  matchSound.volume = 1;
-</script>
-  
 </body>
 </html>
