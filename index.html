@@ -13,209 +13,148 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
   <style>
-  body {
-    margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-    background: linear-gradient(135deg, #f7cfe3, #c6dff5);
-  }
-
-  h1 {
-    margin-top: 30px;
-    text-align: center;
-    font-size: 2rem;
-  }
-
-  main {
-    flex: 1;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  button {
-    background: #ff85c1;
-    color: white;
-    border: none;
-    padding: 15px 25px;
-    border-radius: 10px;
-    font-size: 1.2rem;
-    cursor: pointer;
-    transition: 0.2s;
-  }
-
-  button:hover {
-    background: #e66cae;
-    transform: scale(1.05);
-  }
-
-  .bottom-buttons {
-    margin-bottom: 20px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    justify-content: center;
-    width: 100%;
-  }
-
-  footer {
-    text-align: center;
-    padding: 15px;
-    font-size: 0.9rem;
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
-    width: 100%;
-  }
-
-  .modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 99;
-    padding: 20px;
-    box-sizing: border-box;
-  }
-
-.modal-content {
-  background: #222;
-  color: white;
-  padding: 30px;
-  border-radius: 15px;
-  width: 100%;
-  max-width: 600px;
-  max-height: 90vh; /* restrict height */
-  overflow-y: auto;  /* allow vertical scroll */
-  text-align: center;
-  box-sizing: border-box;
-}
-
-  .avatar-option {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid transparent;
-    cursor: pointer;
-  }
-
-  .avatar-option:hover {
-    border-color: #ff85c1;
-    transform: scale(1.1);
-  }
-
-  #avatarPreview {
-    margin-top: 10px;
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    border: 3px solid #ff85c1;
-  }
-
-  input {
-    padding: 10px;
-    font-size: 1rem;
-    border-radius: 8px;
-    width: 80%;
-    max-width: 300px;
-    margin: 10px 0;
-    border: none;
-    outline: none;
-  }
-
-  .leaderboard-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-  }
-
-  .leaderboard-table th,
-  .leaderboard-table td {
-    padding: 10px;
-    color: white;
-  }
-
-  .leaderboard-table thead {
-    background: #ff85c1;
-  }
-
-  .leaderboard-table tbody tr:nth-child(even) {
-    background: #333;
-  }
-
-  .highlight {
-    background-color: gold;
-    color: black;
-  }
-  
-  .profile-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 20px;
-  flex-wrap: wrap;
-}
-
-  @media (max-width: 500px) {
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #f7cfe3, #c6dff5);
+    }
     h1 {
-      font-size: 1.6rem;
+      margin-top: 30px;
+      font-size: 2rem;
+      text-align: center;
     }
-
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+    }
     button {
-      width: 90%;
-      font-size: 1rem;
+      background: #ff85c1;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: 0.2s;
     }
-
+    button:hover {
+      background: #e66cae;
+      transform: scale(1.05);
+    }
+    .bottom-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    footer {
+      text-align: center;
+      padding: 15px;
+      font-size: 0.9rem;
+      border-top: 1px solid #ccc;
+      width: 100%;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
     .modal-content {
-  background: #222;
-  color: white;
-  padding: 30px;
-  border-radius: 15px;
-  width: 100%;
-  max-width: 600px;
-  max-height: 90vh; /* restrict height */
-  overflow-y: auto;  /* allow vertical scroll */
-  text-align: center;
-  box-sizing: border-box;
-}
+      background: #222;
+      color: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      text-align: center;
+    }
+    input {
+      padding: 10px;
+      font-size: 1rem;
+      width: 80%;
+      max-width: 300px;
+      border: none;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+    .avatar-option {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 5px;
+      border: 2px solid transparent;
+      cursor: pointer;
+    }
+    .avatar-option:hover {
+      border-color: #ff85c1;
+      transform: scale(1.1);
+    }
+    #avatarPreview {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin-top: 10px;
+      border: 3px solid #ff85c1;
+    }
+    .leaderboard-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
     .leaderboard-table th,
     .leaderboard-table td {
-      font-size: 0.85rem;
-      padding: 8px;
+      padding: 10px;
+      border-bottom: 1px solid #444;
+    }
+    .leaderboard-table thead {
+      background: #ff85c1;
+    }
+    .leaderboard-table tbody tr:nth-child(even) {
+      background: #333;
+    }
+    .profile-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
     }
 
-    #avatarPreview {
-      width: 80px;
-      height: 80px;
+    @media (max-width: 500px) {
+      h1 { font-size: 1.6rem; }
+      button { width: 90%; font-size: 1rem; }
+      .avatar-option { width: 50px; height: 50px; }
+      #avatarPreview { width: 80px; height: 80px; }
     }
-
-    .avatar-option {
-      width: 50px;
-      height: 50px;
-    }
-  }
-</style>
+  </style>
 </head>
 <body>
 
   <h1>Match the Card SVT</h1>
-
   <main>
     <button onclick="startGame()">🎮 Start Game</button>
   </main>
 
   <div class="bottom-buttons">
-    <button onclick="document.getElementById('profileModal').style.display='flex'">👤 Profile</button>
-    <button onclick="document.getElementById('leaderboardModal').style.display='flex'; loadLeaderboard();">🏆 Leaderboard</button>
-    <button onclick="document.getElementById('aboutModal').style.display='flex'">ℹ️ About</button>
+    <button onclick="openModal('profileModal')">👤 Profile</button>
+    <button onclick="openModal('leaderboardModal'); loadLeaderboard();">🏆 Leaderboard</button>
+    <button onclick="openModal('aboutModal')">ℹ️ About</button>
   </div>
 
   <footer>
@@ -226,30 +165,15 @@
   <div id="profileModal" class="modal">
     <div class="modal-content">
       <h2>Edit Profile</h2>
-      <input type="text" id="profileName" placeholder="Enter your name" /><br>
+      <input type="text" id="profileName" placeholder="Enter your name" />
       <p>Select Avatar:</p>
-      <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
-        <img src="https://uploads.onecompiler.io/432zqmf3k/43mwmcrmj/miniteen10-768x768.png" class="avatar-option" onclick="selectAvatar(this)">
-        <img src="https://uploads.onecompiler.io/432zqmf3k/43mwmcrmj/miniteen13-768x768.png" class="avatar-option" onclick="selectAvatar(this)">
-        <img src="https://uploads.onecompiler.io/432zqmf3k/43mwmcrmj/miniteen9-768x768.png" class="avatar-option" onclick="selectAvatar(this)">
-        <img src="https://uploads.onecompiler.io/432zqmf3k/43mwmcrmj/miniteen8-768x768.png" class="avatar-option" onclick="selectAvatar(this)">
-        <img src="https://uploads.onecompiler.io/432zqmf3k/43mwmcrmj/miniteen11-768x768.png" class="avatar-option" onclick="selectAvatar(this)">
-        <img src="https://uploads.onecompiler.io/432zqmf3k/43mwmcrmj/miniteen12-768x768.png" class="avatar-option" onclick="selectAvatar(this)">
-        <img src="https://uploads.onecompiler.io/432zqmf3k/43mwmcrmj/miniteen7-768x768.png" class="avatar-option" onclick="selectAvatar(this)">
-        <img src="https://uploads.onecompiler.io/432zqmf3k/43mwmcrmj/miniteen6-768x768.png" class="avatar-option" onclick="selectAvatar(this)">
-        <img src="https://uploads.onecompiler.io/432zqmf3k/43mwmcrmj/miniteen5-768x768.png" class="avatar-option" onclick="selectAvatar(this)">
-        <img src="https://uploads.onecompiler.io/432zqmf3k/43mwmcrmj/miniteen4-768x768.png" class="avatar-option" onclick="selectAvatar(this)">
-        <img src="https://uploads.onecompiler.io/432zqmf3k/43mwmcrmj/miniteen3-768x768.png" class="avatar-option" onclick="selectAvatar(this)">
-        <img src="https://uploads.onecompiler.io/432zqmf3k/43mwmcrmj/miniteen2-768x768.png" class="avatar-option" onclick="selectAvatar(this)">
-        <img src="https://uploads.onecompiler.io/432zqmf3k/43mwmcrmj/miniteen1-800x800.png" class="avatar-option" onclick="selectAvatar(this)">
-      </div>
+      <div id="avatarList" style="display:flex; flex-wrap:wrap; justify-content:center;"></div>
       <p>Selected Avatar:</p>
-      <img id="avatarPreview" src="https://uploads.onecompiler.io/432zqmf3k/43mwmcrmj/miniteen10-768x768.png" alt="Preview" />
-      <br><br>
+      <img id="avatarPreview" src="" />
       <div class="profile-buttons">
-  <button onclick="saveProfile()">💾 Save</button>
-  <button onclick="document.getElementById('profileModal').style.display='none'">❌ Close</button>
-</div>
+        <button onclick="saveProfile()">💾 Save</button>
+        <button onclick="closeModal('profileModal')">❌ Close</button>
+      </div>
     </div>
   </div>
 
@@ -263,7 +187,7 @@
           <tr><td colspan="4">Loading...</td></tr>
         </tbody>
       </table>
-      <button onclick="document.getElementById('leaderboardModal').style.display='none'">Close</button>
+      <button onclick="closeModal('leaderboardModal')">Close</button>
     </div>
   </div>
 
@@ -271,27 +195,19 @@
   <div id="aboutModal" class="modal">
     <div class="modal-content">
       <h2>About the Game</h2>
-      <p><strong>Match the Card SVT</strong> is a fun and challenging memory game made especially for SEVENTEEN fans! 🩷✨</p>
-
-  <p>Your goal is simple: flip the cards and find the matching pairs. If the two cards you flip are a match, they stay open. If not, they’ll flip back, and you’ll need to remember their positions for later.</p>
-
-  <p>But that’s not all — the game gets harder as you progress!</p>
-
-  <ul>
-    🧠 100 exciting levels to complete, with increasing difficulty!</li>
-    💡 Test your memory, speed, and focus!</li>
-    💎 The faster and smarter you play, the higher your score!</li>
-    🥇 Compete on the leaderboard to earn ranks and medals!</li>
-    🔓 Unlock new levels as you match your way to the top!</li>
-  </ul>
-
-  <p><strong>Match the Card SVT</strong> is a completely free and fun way to boost your memory and focus while challenging yourself through 100 exciting levels!</p>
-  <p><em>🛠️ More updates, features, and surprises will be added soon — stay tuned!</em></p>
-      <button onclick="document.getElementById('aboutModal').style.display='none'">Close</button>
+      <p><strong>Match the Card SVT</strong> is a memory card game for CARATs (SEVENTEEN fans)! Match cards, complete levels, and earn a spot on the leaderboard!</p>
+      <ul style="text-align:left;">
+        <li>🧠 100 exciting levels</li>
+        <li>💡 Improve memory & focus</li>
+        <li>💎 Score based on speed & moves</li>
+        <li>🥇 Top ranks earn medals</li>
+        <li>🔓 Unlock new levels</li>
+      </ul>
+      <button onclick="closeModal('aboutModal')">Close</button>
     </div>
   </div>
 
- <script>
+<script>
   const firebaseConfig = {
     apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
     authDomain: "tvnstream-b4497.firebaseapp.com",
@@ -306,113 +222,178 @@
 
   const profileNameInput = document.getElementById("profileName");
   const avatarPreview = document.getElementById("avatarPreview");
+  const avatarList = document.getElementById("avatarList");
 
-  // On load, fill profile if already saved
-  window.onload = async () => {
-    const savedName = localStorage.getItem("playerName");
-    const savedAvatar = localStorage.getItem("playerAvatar");
+  const avatars = Array.from({ length: 13 }, (_, i) => 
+    `https://uploads.onecompiler.io/432zqmf3k/43mwmcrmj/miniteen${i + 1}-768x768.png`
+  );
 
-    if (savedName) {
-      profileNameInput.value = savedName;
-      profileNameInput.readOnly = true; // prevent name change
-      avatarPreview.src = savedAvatar || avatarPreview.src;
-
-      // Optionally fetch from Firebase to update avatar
-      const snap = await db.ref("profiles/" + savedName).get();
-      if (snap.exists()) {
-        const profile = snap.val();
-        avatarPreview.src = profile.avatar;
-        localStorage.setItem("playerAvatar", profile.avatar);
-      }
-    }
-  };
+  function populateAvatars() {
+    avatarList.innerHTML = '';
+    avatars.forEach(src => {
+      const img = document.createElement('img');
+      img.src = src;
+      img.className = "avatar-option";
+      img.onclick = () => selectAvatar(img);
+      avatarList.appendChild(img);
+    });
+  }
 
   function selectAvatar(img) {
     avatarPreview.src = img.src;
   }
 
-  async function saveProfile() {
-    const name = profileNameInput.value.trim();
-    const avatar = avatarPreview.src;
+  function openModal(id) {
+    document.getElementById(id).style.display = 'flex';
+  }
 
-    if (!name) return alert("Please enter your name!");
+  function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+  }
 
-    const profileRef = db.ref("profiles/" + name);
-    const snap = await profileRef.get();
+  window.onload = async () => {
+  populateAvatars();
 
-    // Name already saved (readonly), just update avatar
-    if (profileNameInput.readOnly) {
-      await profileRef.update({ avatar });
-      localStorage.setItem("playerAvatar", avatar);
-      alert("✅ Avatar updated!");
-      document.getElementById("profileModal").style.display = 'none';
-      return;
-    }
+  const name = localStorage.getItem("playerName");
+  const avatar = localStorage.getItem("playerAvatar");
 
-    // Name not used yet → save full profile
+  if (name) {
+    profileNameInput.value = name;
+    avatarPreview.src = avatar || avatarPreview.src;
+
+    const snap = await db.ref("profiles/" + name).get();
     if (snap.exists()) {
-      alert("❌ Name already taken. Please choose another.");
+      const profile = snap.val();
+      avatarPreview.src = profile.avatar;
+      localStorage.setItem("playerAvatar", profile.avatar);
+      profileNameInput.disabled = true; // ✅ disable only if existing name
+    }
+  } else {
+    profileNameInput.disabled = false; // ✅ allow typing name if first time
+    avatarPreview.src = avatars[0]; // default avatar
+  }
+};
+
+  async function saveProfile() {
+  const name = profileNameInput.value.trim();
+  const avatar = avatarPreview.src;
+  if (!name) return alert("Please enter your name!");
+
+  const savedName = localStorage.getItem("playerName");
+  const savedAvatar = localStorage.getItem("playerAvatar");
+
+  const isNew = !savedName;
+  const nameChanged = savedName && savedName !== name;
+
+  const newRef = db.ref("profiles/" + name);
+  const oldRef = db.ref("profiles/" + savedName);
+  const scoreRef = db.ref("scores/" + savedName);
+
+  // Special handling for 'Hoskwi_onX'
+  if (name === "Hoskwi_onX") {
+    const profileSnap = await newRef.get();
+    if (profileSnap.exists()) {
+      const storedPassword = profileSnap.val().password;
+      const inputPassword = prompt("🔐 Enter password for Hoskwi_onX:");
+      if (inputPassword !== storedPassword) return alert("❌ Incorrect password.");
+
+      localStorage.setItem("playerName", name);
+      localStorage.setItem("playerAvatar", profileSnap.val().avatar);
+      profileNameInput.disabled = true;
+      closeModal('profileModal');
+      alert("✅ Logged in as Hoskwi_onX!");
+      return;
+    } else {
+      const password = prompt("🔐 Set a password for Hoskwi_onX:");
+      if (!password) return alert("❌ Password is required.");
+      await newRef.set({ name, avatar, password });
+      localStorage.setItem("playerName", name);
+      localStorage.setItem("playerAvatar", avatar);
+      profileNameInput.disabled = true;
+      closeModal('profileModal');
+      alert("✅ Hoskwi_onX profile created and logged in!");
       return;
     }
+  }
 
-    await profileRef.set({ name, avatar });
+  if (isNew) {
+    const snap = await newRef.get();
+    if (snap.exists()) return alert("❌ Name taken!");
+    await newRef.set({ name, avatar });
     localStorage.setItem("playerName", name);
     localStorage.setItem("playerAvatar", avatar);
+    profileNameInput.disabled = true;
+    closeModal('profileModal');
     alert("✅ Profile saved!");
-    profileNameInput.readOnly = true;
-    document.getElementById("profileModal").style.display = 'none';
+    return;
   }
+
+  if (nameChanged) {
+    const confirm = window.confirm("⚠️ Changing name costs 50 points. Continue?");
+    if (!confirm) return;
+
+    const taken = await newRef.get();
+    if (taken.exists()) return alert("❌ Name already taken.");
+
+    const [profileSnap, scoreSnap] = await Promise.all([oldRef.get(), scoreRef.get()]);
+    const score = Math.max(0, (scoreSnap.val()?.total || 0) - 50);
+    await newRef.set({ name, avatar });
+    await db.ref("scores/" + name).set({ total: score });
+    await oldRef.remove();
+    await scoreRef.remove();
+
+    localStorage.setItem("playerName", name);
+    localStorage.setItem("playerAvatar", avatar);
+    profileNameInput.disabled = true;
+    closeModal('profileModal');
+    alert(`✅ Name changed. New score: ${score}`);
+    return;
+  }
+
+  if (avatar !== savedAvatar) {
+    await db.ref("profiles/" + name).update({ avatar });
+    localStorage.setItem("playerAvatar", avatar);
+    closeModal('profileModal');
+    alert("✅ Avatar updated!");
+  }
+}
 
   function startGame() {
     const name = localStorage.getItem("playerName");
-    if (!name) return alert("Please save your profile first!");
+    if (!name) return alert("Please set your profile first!");
     window.location.href = "game.html?playerName=" + encodeURIComponent(name);
   }
 
- function loadLeaderboard() {
-  const list = document.getElementById("leaderboardList");
-  list.innerHTML = `<tr><td colspan="4">Loading...</td></tr>`;
+  function loadLeaderboard() {
+    const list = document.getElementById("leaderboardList");
+    list.innerHTML = `<tr><td colspan="4">Loading...</td></tr>`;
 
-  const scoresRef = db.ref("scores");
-  const progressRef = db.ref("progress");
+    Promise.all([
+      db.ref("scores").once("value"),
+      db.ref("progress").once("value")
+    ]).then(([scoresSnap, progressSnap]) => {
+      const scores = scoresSnap.val() || {};
+      const progress = progressSnap.val() || {};
 
-  Promise.all([
-    scoresRef.once("value"),
-    progressRef.once("value")
-  ]).then(([scoreSnap, progressSnap]) => {
-    const scores = scoreSnap.val() || {};
-    const progress = progressSnap.val() || {};
+      const data = Object.entries(scores).map(([name, { total }]) => ({
+        name,
+        score: total || 0,
+        level: (progress[name]?.currentLevel || 2) - 1
+      }));
 
-    const combined = Object.entries(scores).map(([name, data]) => ({
-      name,
-      score: data.total || 0,
-      level: progress[name]?.currentLevel - 1 || 1
-    }));
+      data.sort((a, b) => b.score - a.score);
 
-    combined.sort((a, b) => b.score - a.score);
-
-    if (combined.length === 0) {
-      list.innerHTML = `<tr><td colspan="4">No scores yet.</td></tr>`;
-      return;
-    }
-
-    list.innerHTML = combined.map((entry, i) => {
-      let rankDisplay = i + 1;
-      if (i === 0) rankDisplay = '🥇';
-      else if (i === 1) rankDisplay = '🥈';
-      else if (i === 2) rankDisplay = '🥉';
-
-      return `
+      list.innerHTML = data.length ? data.map((p, i) => `
         <tr>
-          <td>${rankDisplay}</td>
-          <td>${entry.name}</td>
-          <td>${entry.level}</td>
-          <td>${entry.score}</td>
+          <td>${i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}</td>
+          <td>${p.name}</td>
+          <td>${p.level}</td>
+          <td>${p.score}</td>
         </tr>
-      `;
-    }).join('');
-  });
-}
+      `).join("") : `<tr><td colspan="4">No scores yet.</td></tr>`;
+    });
+  }
+
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js');
   }
