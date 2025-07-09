@@ -274,7 +274,7 @@
   }
 };
 
-  async function saveProfile() {
+ async function saveProfile() {
   const name = profileNameInput.value.trim();
   const avatar = avatarPreview.src;
   if (!name) return alert("Please enter your name!");
@@ -351,10 +351,23 @@
   }
 
   if (avatar !== savedAvatar) {
+    const scoreSnap = await scoreRef.get();
+    let currentScore = scoreSnap.val()?.total || 0;
+
+    if (currentScore < 50) {
+      return alert("❌ Not enough stars to change avatar! You need at least 50.");
+    }
+
+    const confirm = window.confirm("⚠️ Changing avatar costs 50 stars. Continue?");
+    if (!confirm) return;
+
+    currentScore -= 50;
     await db.ref("profiles/" + name).update({ avatar });
+    await scoreRef.update({ total: currentScore });
+
     localStorage.setItem("playerAvatar", avatar);
     closeModal('profileModal');
-    alert("✅ Avatar updated!");
+    alert(`✅ Avatar updated! Remaining stars: ${currentScore}`);
   }
 }
 
