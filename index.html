@@ -13,6 +13,21 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
   <style>
+  body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: url("https://uploads.onecompiler.io/43ddry4jt/43q3zhrvq/create%20a%20new%20logo%20fo.png");
+  background-size: cover;
+  background-position: center;
+  filter: blur(10px);
+  z-index: -1;
+  opacity: 0.3;
+} 
+
     * { box-sizing: border-box; }
     body {
       margin: 0;
@@ -162,7 +177,7 @@
   </footer>
 
   <!-- Profile Modal -->
-  <div id="profileModal" class="modal">
+   <div id="profileModal" class="modal">
     <div class="modal-content">
       <h2>Edit Profile</h2>
       <input type="text" id="profileName" placeholder="Enter your name" />
@@ -170,6 +185,13 @@
       <div id="avatarList" style="display:flex; flex-wrap:wrap; justify-content:center;"></div>
       <p>Selected Avatar:</p>
       <img id="avatarPreview" src="" />
+
+      <!-- ✅ ADDED: Score and Level Display -->
+      <div id="profileStats" style="margin-top: 20px;">
+        <p>⭐ <strong>Stars:</strong> <span id="profileScore">0</span></p>
+        <p>🧠 <strong>Level:</strong> <span id="profileLevel">0</span></p>
+      </div>
+
       <div class="profile-buttons">
         <button onclick="saveProfile()">💾 Save</button>
         <button onclick="closeModal('profileModal')">❌ Close</button>
@@ -237,6 +259,8 @@
   const profileNameInput = document.getElementById("profileName");
   const avatarPreview = document.getElementById("avatarPreview");
   const avatarList = document.getElementById("avatarList");
+  const profileScoreEl = document.getElementById("profileScore");
+  const profileLevelEl = document.getElementById("profileLevel");
 
   const avatars = Array.from({ length: 13 }, (_, i) => 
     `https://uploads.onecompiler.io/432zqmf3k/43mwmcrmj/miniteen${i + 1}-768x768.png`
@@ -256,10 +280,31 @@
   function selectAvatar(img) {
     avatarPreview.src = img.src;
   }
+  
 
   function openModal(id) {
     document.getElementById(id).style.display = 'flex';
+      if (id === "profileModal") {
+    const name = localStorage.getItem("playerName");
+    if (!name) {
+      profileScoreEl.textContent = "0";
+      profileLevelEl.textContent = "1";
+      return;
+    }
+
+    Promise.all([
+      db.ref("scores/" + name).get(),
+      db.ref("progress/" + name).get()
+    ]).then(([scoreSnap, progressSnap]) => {
+      const score = scoreSnap.exists() ? scoreSnap.val().total || 0 : 0;
+      const level = progressSnap.exists() ? (progressSnap.val().currentLevel || 2) - 1 : 1;
+
+      profileScoreEl.textContent = score;
+      profileLevelEl.textContent = level;
+    });
   }
+}
+  
 
   function closeModal(id) {
     document.getElementById(id).style.display = 'none';
@@ -386,9 +431,9 @@
 
     const [profileSnap, scoreSnap] = await Promise.all([oldRef.get(), scoreRef.get()]);
     let currentScore = scoreSnap.val()?.total || 0;
-    if (currentScore < 50) return alert("❌ Not enough stars to change name!");
+    if (currentScore < 100) return alert("❌ Not enough stars to change name!");
 
-    currentScore -= 50;
+    currentScore -= 100;
 
     await newRef.set({ name, avatar });
     await db.ref("scores/" + name).set({ total: currentScore });
@@ -407,12 +452,12 @@
     const scoreSnap = await scoreRef.get();
     let currentScore = scoreSnap.val()?.total || 0;
 
-    if (currentScore < 50) return alert("❌ Not enough stars to change avatar!");
+    if (currentScore < 100) return alert("❌ Not enough stars to change avatar!");
 
     const confirm = window.confirm("⚠️ Changing avatar costs 50 stars. Continue?");
     if (!confirm) return;
 
-    currentScore -= 50;
+    currentScore -= 100;
     await db.ref("profiles/" + name).update({ avatar });
     await scoreRef.update({ total: currentScore });
 
